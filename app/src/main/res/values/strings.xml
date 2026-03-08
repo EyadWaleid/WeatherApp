@@ -4,4 +4,6 @@
     <string name="alert">Alert</string>
     <string name="setting">Settings</string>
     <string name="dicover">Discover</string>
+    <string name="englishLanguageChoose">English (US)</string>
+    <string name="arabicLanguageChoose">Arabic (EG)</string>
 </resources>

@@ -5,4 +5,6 @@
     <string name="alert">تنبيهات</string>
     <string name="setting">الأعدادت</string>
     <string name="dicover">اكتشف</string>
+    <string name="englishLanguageChoose">"الإنجليزية (الولايات المتحدة) "</string>
+    <string name="arabicLanguageChoose">العربية (مصر)</string>
 </resources>

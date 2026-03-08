@@ -1,11 +1,14 @@
 package com.example.weatherapp
 
+import android.content.res.Configuration
 import android.net.http.SslCertificate.restoreState
 import android.net.http.SslCertificate.saveState
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,29 +32,37 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weatherapp.screens.viewmodel.SettingViewModel
+import com.example.weatherapp.screens.viewmodel.SettingViewModelFactory
 import com.example.weatherapp.screens.viewmodel.WeatherFactory
 import com.example.weatherapp.screens.viewmodel.WeatherViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.utils.Constants
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         setContent {
             val weahtherViewModel: WeatherViewModel= viewModel(factory = WeatherFactory(context = this.application))
+            val settingViewModel: SettingViewModel=viewModel  (factory = SettingViewModelFactory(context = this.application))
 
             WeatherAppTheme {
                 val navController = rememberNavController()
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = { BottomNavigationBar(navController = navController) }) { innerPadding ->
-                    Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel)
+                    Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel,settingViewModel)
 
                 }
             }
         }
+    }
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        recreate()
     }
 }
 

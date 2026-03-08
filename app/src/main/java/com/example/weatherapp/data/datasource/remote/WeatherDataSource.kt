@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.flow
 
 class WeatherDataSource {
     val weatherService : WeatherService= AppNetwork().getCountryTemp()
-    fun getWeatherCountryInfo(lat: Double, long: Double) : Flow<Result<ForecastData>>{
+    fun getWeatherCountryInfo(lat: Double, long: Double , units:String="metric") : Flow<Result<ForecastData>>{
        return flow {
            try{
-               val result =weatherService.getCurrentWeather(lat =lat, lon = long )
+               val result =weatherService.getCurrentWeather(lat =lat, lon = long, units = units )
                if (result.isSuccessful){
                    emit(Result.success(result.body()?: ForecastData.empty() ))
                }

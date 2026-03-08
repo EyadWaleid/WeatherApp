@@ -1,5 +1,6 @@
 package com.example.weatherapp.screens
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,39 +38,67 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherapp.R
+import com.example.weatherapp.screens.viewmodel.SettingViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
+import com.example.weatherapp.utils.AppLocalization
+import com.example.weatherapp.utils.Language
+import com.example.weatherapp.utils.TempUnits
+import com.example.weatherapp.utils.WindUnit
 
 @Composable
-fun  SettingScreen(modifier: Modifier= Modifier){
-    Column (modifier = modifier.fillMaxSize().background(colorResource(R.color.darkBlue)).padding(8.dp),
-      ) {
-        AppBar()
-        Spacer(modifier = Modifier.size(32.dp))
-        Text("Location Source", color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
-        Spacer(modifier = Modifier.size(12.dp))
-        LocationTrackerBtnToggle()
-        Spacer(modifier = Modifier.size(32.dp))
-        Text("Temperature Units", color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
-        Spacer(modifier = Modifier.size(12.dp))
-        TemperatureUnitsBtnToggle()
-        Spacer(modifier = Modifier.size(32.dp))
-        Text("Wind Speed Units", color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
-        Spacer(modifier = Modifier.size(12.dp))
-        WindUnitsBtnToggle()
-        Spacer(modifier = Modifier.size(32.dp))
-        LanguageDropdown()
-
-
-    }
+fun  SettingScreen(modifier: Modifier= Modifier,settingViewModel: SettingViewModel){
+    val userSettingsState by settingViewModel.settingsState.collectAsState()
+   when(userSettingsState){
+       is SettingViewModel.SettingsState.Data -> {
+           Column (modifier = modifier.fillMaxSize().background(colorResource(R.color.darkBlue)).padding(8.dp),
+           ) {
+               AppBar()
+               Spacer(modifier = Modifier.size(32.dp))
+               Text("Location Source", color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
+               Spacer(modifier = Modifier.size(12.dp))
+               LocationTrackerBtnToggle()
+               Spacer(modifier = Modifier.size(32.dp))
+               Text("Temperature Units", color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
+               Spacer(modifier = Modifier.size(12.dp))
+               TemperatureUnitsBtnToggle(tempUInt = (userSettingsState as SettingViewModel.SettingsState.Data).tempUnit, onClick = {
+                   when(it){
+                       0->settingViewModel.setTempUnit(TempUnits.CELSIUS.displayName)
+                       1->settingViewModel.setTempUnit(TempUnits.FAHRENHEIT.displayName)
+                       2->settingViewModel.setTempUnit(TempUnits.KELVIN.displayName)
+                   }
+               })
+               Spacer(modifier = Modifier.size(32.dp))
+               Text("Wind Speed Units", color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
+               Spacer(modifier = Modifier.size(12.dp))
+               WindUnitsBtnToggle(windUnit = (userSettingsState as SettingViewModel.SettingsState.Data).windUnit, onClick = {
+                   when(it){
+                       0->settingViewModel.setTempUnit( WindUnit.METERS_PER_SECOND.displayName)
+                       1->settingViewModel.setWindUnit(WindUnit.MILES_PER_HOUR.displayName)
+                   }
+               })
+               Spacer(modifier = Modifier.size(32.dp))
+               LanguageDropdown((userSettingsState as SettingViewModel.SettingsState.Data).language, onClick = {
+                   settingViewModel.setLanguage(it)
+               })
+           }
+       }
+       is SettingViewModel.SettingsState.Error -> {
+           Text("There is no data wait please ")
+       }
+       is SettingViewModel.SettingsState.Loading -> {
+           Text("Setting data for u wait XD")
+       }
+   }
 }
-
 @Composable
 fun AppBar(modifier: Modifier= Modifier){
     val lineColor = colorResource(R.color.blueWithOpcity)
@@ -163,8 +195,17 @@ fun LocationTrackerBtnToggle(modifier: Modifier= Modifier){
     }
 }
 @Composable
-fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier){
+fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onClick:(Int)-> Unit){
     var selectedIndex by remember { mutableStateOf(0) }
+
+    LaunchedEffect(tempUInt) {
+        selectedIndex = when (tempUInt) {
+            TempUnits.CELSIUS.displayName -> 0
+            TempUnits.FAHRENHEIT.displayName -> 1
+            TempUnits.KELVIN.displayName -> 2
+            else -> 0
+        }
+    }
     val options = listOf("Celsius (°C)", "Fahrenheit (°F)","Kelvin (K)")
     Box(
         modifier = Modifier
@@ -198,9 +239,12 @@ fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier){
                                 Color(0xFF3A4A5F)
                             else
                                 Color.Transparent
-                        )
-
-                        .clickable { selectedIndex = index },
+                        ).clickable {
+                        if(selectedIndex!=index){
+                                selectedIndex=index
+                                onClick(index)
+                            }
+                            },
                     contentAlignment = Alignment.Center
                 ) {
 
@@ -223,8 +267,16 @@ fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier){
     }
 }
 @Composable
-fun WindUnitsBtnToggle(modifier: Modifier= Modifier){
-    var selectedIndex by remember { mutableStateOf(0) }
+fun WindUnitsBtnToggle(modifier: Modifier= Modifier,onClick: (Int) -> Unit , windUnit: String){
+    var selectedIndex by remember { mutableIntStateOf(0) }
+    LaunchedEffect(windUnit) {
+        selectedIndex = when (windUnit) {
+            WindUnit.METERS_PER_SECOND.displayName -> 0
+            WindUnit.MILES_PER_HOUR.displayName -> 1
+            else -> 0
+        }
+    }
+
     val options = listOf("m/s", "mph")
     Box(
         modifier = Modifier
@@ -286,12 +338,18 @@ fun WindUnitsBtnToggle(modifier: Modifier= Modifier){
         }
     }
 }
-@Composable
-fun LanguageDropdown() {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedLanguage by remember { mutableStateOf("English (US)") }
-    val languages = listOf("English (US)", "Arabic (EG)",)
 
+@Composable
+fun LanguageDropdown(languageCode:String,onClick: (String) -> Unit) {
+
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedLanguage by remember { mutableStateOf(languageCode) }
+    LaunchedEffect(selectedLanguage) {
+       selectedLanguage=languageCode
+        }
+
+    val languages = listOf(Language.ENGLISH, Language.ARABIC,)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -315,7 +373,9 @@ fun LanguageDropdown() {
                 Column {
                     Text("Display Language", fontSize = 12.sp, color = Color.Gray)
                     Spacer(modifier = Modifier.size(5.dp))
-                    Text(selectedLanguage, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(if(selectedLanguage == "en")stringResource(Language.ENGLISH.resId)else stringResource(Language.ARABIC.resId), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Log.d("Localize","Enter here in Text  with $selectedLanguage")
+
                 }
             }
             Icon(
@@ -324,7 +384,6 @@ fun LanguageDropdown() {
                 tint = Color.Gray
             )
         }
-
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
@@ -335,12 +394,14 @@ fun LanguageDropdown() {
             languages.forEach { language ->
                 DropdownMenuItem(
                     onClick = {
-                        selectedLanguage = language
+                        if(selectedLanguage != language.code){
+                            selectedLanguage=language.code
+                      onClick(selectedLanguage)
+                        }
                         expanded = false
                     },
                     text = {
-                        Text(text = language, color = Color.White)
-
+                        Text(text = stringResource(language.resId), color = Color.White)
                            },
 
                 )

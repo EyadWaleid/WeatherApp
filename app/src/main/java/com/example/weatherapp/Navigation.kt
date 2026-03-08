@@ -1,7 +1,9 @@
 package com.example.weatherapp
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -16,14 +18,17 @@ import com.example.weatherapp.screens.SettingScreen
 import com.example.weatherapp.utils.Route
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
+import com.example.weatherapp.screens.viewmodel.SettingViewModel
 import com.example.weatherapp.screens.viewmodel.WeatherViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("RestrictedApi")
 @Composable
 fun Navigation(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
-    weatherViewModel: WeatherViewModel
+    weatherViewModel: WeatherViewModel,
+    settingViewModel: SettingViewModel
 ) {
     Log.d("Screen","The backStack size :- ${navHostController.currentBackStack.collectAsState().value.size}")
 
@@ -58,7 +63,7 @@ fun Navigation(
     ) {
 
         composable<Route.HomeScreen> { HomeScreen(modifier = modifier,weatherViewModel) }
-        composable<Route.SettingsScreen> { SettingScreen(modifier=modifier) }
+        composable<Route.SettingsScreen> { SettingScreen(modifier=modifier, settingViewModel = settingViewModel) }
         composable<Route.AlertScreen> { AlertScreen(modifier=modifier) }
         composable<Route.DiscoverScreen> { DiscoverScreen(modifier = modifier) }
     }

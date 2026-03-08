@@ -20,7 +20,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -33,6 +32,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -43,17 +43,22 @@ android {
     buildFeatures {
         compose = true
     }
+/*    androidResources {
+        generateLocaleConfig = true
+    }*/
 }
 
 dependencies {
     implementation(libs.locationServices)
-
+    implementation(libs.data.store.preferences)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.compose)
     implementation(libs.lifecycle.viewmodel.compose.android)
     implementation(libs.room.kts)
     implementation(libs.room.runtime)
+    implementation(libs.androidx.ui.geometry)
+    implementation(libs.androidx.appcompat)
     ksp(libs.room.compiler)
     implementation(libs.locationServices)
     implementation(libs.kotlinx.serialization.json)
