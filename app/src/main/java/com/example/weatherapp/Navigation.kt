@@ -11,15 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.example.weatherapp.screens.AlertScreen
-import com.example.weatherapp.screens.DiscoverScreen
-import com.example.weatherapp.screens.HomeScreen
-import com.example.weatherapp.screens.SettingScreen
+import com.example.weatherapp.screens.alert.AlertScreen
+import com.example.weatherapp.screens.discoverScreen.DiscoverScreen
+import com.example.weatherapp.screens.home.view.HomeScreen
+import com.example.weatherapp.screens.settings.view.SettingScreen
 import com.example.weatherapp.utils.Route
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.ViewModel
-import com.example.weatherapp.screens.viewmodel.SettingViewModel
-import com.example.weatherapp.screens.viewmodel.WeatherViewModel
+import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
+import com.example.weatherapp.screens.home.view_model.WeatherViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("RestrictedApi")

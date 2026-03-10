@@ -1,5 +1,6 @@
-package com.example.weatherapp.screens.viewmodel
+package com.example.weatherapp.screens.settings.viewmodel
 
+import android.app.Activity
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -15,9 +16,9 @@ import kotlinx.coroutines.launch
 
 class SettingViewModel(
     val context: Application,
+    val activityContext: Activity,
     val repo: WeatherHomeRepo = WeatherHomeRepo(context = context)
 ) : ViewModel() {
-
     private val _settingsState = MutableStateFlow<SettingsState>(SettingsState.Loading)
     val settingsState: StateFlow<SettingsState> = _settingsState
 
@@ -54,21 +55,20 @@ class SettingViewModel(
         viewModelScope.launch { repo.setWindUnit(unit) }
     }
 
+
     fun setLanguage(lang: String) {
         Log.d("Localize","Enter here in viewModel with $lang")
         viewModelScope.launch {
             repo.setLanguage(lang)
         }
-/*
-       when(lang){
-           "en"->{
-               AppLocalization.changeLanguage(context,"en")
-           }
-           else -> {
-               AppLocalization.changeLanguage(context,"ar")
-           }
-       }
-*/
+        when(lang){
+            "en"->{
+                AppLocalization.changeLanguage(activityContext,"en")
+            }
+            else -> {
+                AppLocalization.changeLanguage(activityContext,"ar")
+            }
+        }
     }
 
     sealed class SettingsState {
@@ -83,8 +83,8 @@ class SettingViewModel(
     }
 }
 
-class SettingViewModelFactory(val context: Application) : ViewModelProvider.Factory {
+class SettingViewModelFactory(val context: Application,val activityContext: Activity) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return SettingViewModel(context) as T
+        return SettingViewModel(context,activityContext) as T
     }
 }

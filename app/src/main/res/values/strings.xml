@@ -6,4 +6,24 @@
     <string name="dicover">Discover</string>
     <string name="englishLanguageChoose">English (US)</string>
     <string name="arabicLanguageChoose">Arabic (EG)</string>
+    <string name="your_location">Your Location</string>
+    <string name="HUMIDITY">HUMIDITY</string>
+    <string name="WIND">WIND</string>
+    <string name="PRESSURE">PRESSURE</string>
+    <string name="CLOUDCOVER">CLOUD COVER</string>
+    <string name="hourly_forecast">Hourly ForeCast</string>
+    <string name="pm">PM</string>
+    <string name="am">AM</string>
+    <string name="settings">Settings</string>
+    <string name="celsius">Celsius (°C)</string>
+    <string name="fahrenheit">Fahrenheit (°F)</string>
+    <string name="kelvin">Kelvin (K)</string>
+    <string name="wind_speed_in_seeconds">m/s</string>
+    <string name="wind_speed_in_hours">mph</string>
+    <string name="location_source">Location source</string>
+    <string name="temperature_units">Temperature units</string>
+    <string name="wind_speed_units">Wind speed units</string>
+    <string name="display_language">Display language</string>
+    <string name="now">Now</string>
+    <string name="forecast_days">5-Day Forecast</string>
 </resources>

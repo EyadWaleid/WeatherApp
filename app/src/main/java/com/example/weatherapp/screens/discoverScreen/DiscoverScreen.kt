@@ -1,4 +1,4 @@
-package com.example.weatherapp.screens
+package com.example.weatherapp.screens.discoverScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +14,10 @@ import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
 
 @Composable
-fun  AlertScreen(modifier: Modifier= Modifier){
+fun  DiscoverScreen(modifier: Modifier= Modifier){
     Column (modifier = Modifier.fillMaxSize().padding(8.dp).background(colorResource(R.color.darkBlue)),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("AlertScreen")
+        Text("DiscoverScreen")
     }
 }

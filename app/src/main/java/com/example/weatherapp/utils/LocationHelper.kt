@@ -1,4 +1,5 @@
 package com.example.weatherapp.utils
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -39,7 +40,7 @@ class LocationHelper (val context: Context){
                         val cancellationToken =
                             CancellationTokenSource().token
                         fusedClient.getCurrentLocation(
-                            Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                            Priority.PRIORITY_HIGH_ACCURACY,
                             cancellationToken
                         ).addOnSuccessListener { freshLocation ->
                             cont.resume(freshLocation)

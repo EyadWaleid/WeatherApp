@@ -1,23 +1,23 @@
 package com.example.weatherapp.data.network
 
-import com.example.weatherapp.data.datasource.remote.WeatherService
+import com.example.weatherapp.data.datasource.remote.WeatherAppService
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.getValue
+import kotlin.jvm.java
 
-class AppNetwork {
-    val gson = GsonBuilder()
+object AppNetwork {
+    private val baseUrl="https://api.openweathermap.org/"
+    private val gson= GsonBuilder()
         .serializeNulls()
         .create()
-    private var weatherService: WeatherService? = null
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.openweathermap.org/")
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .build()
-    fun getCountryTemp(): WeatherService {
-        if (weatherService == null) {
-            weatherService = retrofit.create(WeatherService::class.java)
-        }
-        return weatherService!!
+     private val instance: Retrofit by lazy {
+         Retrofit.Builder().baseUrl(baseUrl)
+             .addConverterFactory(GsonConverterFactory.create(gson))
+             .build()
+     }
+    val weatherService: WeatherAppService by lazy {
+        instance.create(WeatherAppService::class.java)
     }
 }

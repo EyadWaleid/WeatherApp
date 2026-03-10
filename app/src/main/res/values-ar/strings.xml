@@ -7,4 +7,24 @@
     <string name="dicover">اكتشف</string>
     <string name="englishLanguageChoose">"الإنجليزية (الولايات المتحدة) "</string>
     <string name="arabicLanguageChoose">العربية (مصر)</string>
+    <string name="your_location">موقعك الحالي</string>
+    <string name="HUMIDITY">رطوبة</string>
+    <string name="WIND">"رياح "</string>
+    <string name="PRESSURE">"ضغط جوي "</string>
+    <string name="CLOUDCOVER">"غطاء سحابي "</string>
+    <string name="hourly_forecast">"توقعات كل ساعة "</string>
+    <string name="pm">م</string>
+    <string name="am">ص</string>
+    <string name="settings">الأعدادت</string>
+    <string name="celsius">درجة مئوية (°م)</string>
+    <string name="fahrenheit">فهرنهايت (°ف)</string>
+    <string name="kelvin">كلفن (ك)</string>
+    <string name="wind_speed_in_seeconds">ميل/ساعة</string>
+    <string name="wind_speed_in_hours">ميل/ساعة</string>
+    <string name="location_source">مصدر الموقع</string>
+    <string name="temperature_units">وحدات درجة الحرارة</string>
+    <string name="wind_speed_units">وحدات سرعة الرياح</string>
+    <string name="display_language">لغة العرض</string>
+    <string name="now">الأن</string>
+    <string name="forecast_days">توقعات الطقس لخمسة  أيام</string>
 </resources>

@@ -1,8 +1,7 @@
 package com.example.weatherapp
 
+import android.content.Context
 import android.content.res.Configuration
-import android.net.http.SslCertificate.restoreState
-import android.net.http.SslCertificate.saveState
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -22,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,12 +30,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.weatherapp.screens.viewmodel.SettingViewModel
-import com.example.weatherapp.screens.viewmodel.SettingViewModelFactory
-import com.example.weatherapp.screens.viewmodel.WeatherFactory
-import com.example.weatherapp.screens.viewmodel.WeatherViewModel
+import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
+import com.example.weatherapp.screens.settings.viewmodel.SettingViewModelFactory
+import com.example.weatherapp.screens.home.view_model.WeatherFactory
+import com.example.weatherapp.screens.home.view_model.WeatherViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.utils.Constants
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -47,22 +46,34 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val weahtherViewModel: WeatherViewModel= viewModel(factory = WeatherFactory(context = this.application))
-            val settingViewModel: SettingViewModel=viewModel  (factory = SettingViewModelFactory(context = this.application))
+            val settingViewModel: SettingViewModel=viewModel  (factory = SettingViewModelFactory(context = this.application,this))
 
             WeatherAppTheme {
                 val navController = rememberNavController()
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = { BottomNavigationBar(navController = navController) }) { innerPadding ->
-                    Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel,settingViewModel)
+
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        bottomBar = { BottomNavigationBar(navController = navController) }) { innerPadding ->
+                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel,settingViewModel)
+
 
                 }
+
             }
         }
     }
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        recreate()
+    override fun attachBaseContext(base: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            super.attachBaseContext(base)
+        } else {
+            val prefs = base.getSharedPreferences("language_prefs", Context.MODE_PRIVATE)
+            val languageCode = prefs.getString("language", "en") ?: "en"
+            val locale = Locale.forLanguageTag(languageCode)
+            Locale.setDefault(locale)
+            val config = Configuration(base.resources.configuration)
+            config.setLocale(locale)
+            super.attachBaseContext(base.createConfigurationContext(config))
+        }
     }
 }
 

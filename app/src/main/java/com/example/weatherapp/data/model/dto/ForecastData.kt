@@ -1,8 +1,8 @@
-package com.example.weatherapp.data.model
+package com.example.weatherapp.data.model.dto
 data class ForecastData(
-    val list: List<ForecastItem>,
-    val city: City,
 
+    val list: List<ForecastItem>,
+    val city: City
 ) {
     companion object {
         fun empty() = ForecastData(
@@ -76,11 +76,13 @@ data class Weather(
     }
 }
 data class Wind(
-    val speed: Double
+    val speed: Double,
+    val deg: Double
 ) {
     companion object {
         fun empty() = Wind(
-            speed = 0.0
+            speed = 0.0,
+            deg=0.0
         )
     }
 }
