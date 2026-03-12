@@ -2,84 +2,96 @@ package com.example.weatherapp.data.repo
 
 import android.app.Application
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import com.example.weatherapp.data.datasource.local.FavLocalDataSource
 import com.example.weatherapp.data.datasource.local.UserSettings
 import com.example.weatherapp.data.datasource.local.WeatherLocalDatasource
 import com.example.weatherapp.data.datasource.remote.WeatherDataSource
 import com.example.weatherapp.data.model.CountryForecast
+import com.example.weatherapp.data.model.FavCity
 
 import com.example.weatherapp.utils.WeatherMapper.mapToDailyWeather
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 class WeatherHomeRepo(
     val weatherDataSource: WeatherDataSource = WeatherDataSource(),
+    val context: Application,
     val localDatasource: WeatherLocalDatasource= WeatherLocalDatasource(context.applicationContext),
-    val context: Application
+    val favLocalDataSource: FavLocalDataSource= FavLocalDataSource(context = context),
+
 ) {
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun loadCountryWeatherData(
-        lan: Double,
+    suspend fun loadCountryWeatherData(
+        lon: Double,
         lat: Double,
         units: String = "metric",
         lang: String = "en"
-    ): Flow<Result<CountryForecast>> = flow {
-        try {
-            weatherDataSource.getWeatherCountryInfo(lan, lat, units, lang).collect { result ->
-                result.fold(
-                    onSuccess = { forecastData ->
-                        val conuntryWeather = CountryForecast(
-                            city = forecastData.city.name,
-                            countryCode = forecastData.city.country,
-                            weatherOfDays = mapToDailyWeather(
-                                forecastData,
-                                lang = lang
-                            )
-                        )
-
-
-                        localDatasource.insertForecast(conuntryWeather)
-                        emit(Result.success(conuntryWeather))
-                    },
-                    onFailure = { emit(Result.failure(it)) }
+    ): Result<CountryForecast> {
+        return try {
+            val result = weatherDataSource.getWeatherCountryInfo(lon, lat, units, lang)
+            if (result.isSuccess) {
+                val forecastData = result.getOrThrow()
+                val countryWeather = CountryForecast(
+                    city = forecastData.city.name,
+                    countryCode = forecastData.city.country,
+                    weatherOfDays = mapToDailyWeather(forecastData, lang = lang)
                 )
+                localDatasource.insertForecast(countryWeather)
+                Result.success(countryWeather)
+            } else {
+                Result.failure(result.exceptionOrNull() ?: Exception("Unknown error"))
             }
         } catch (e: Exception) {
-
-            localDatasource.getForecast().collect { cached ->
-                if (cached != null) {
-                    emit(Result.success(cached))
-                } else {
-                    emit(Result.failure(Exception("No internet connection and no cached data")))
-                }
+            val cached = localDatasource.getForecast()
+            if (cached != null) {
+                Result.success(cached)
+            } else {
+                Result.failure(Exception("No internet and no cached data"))
             }
         }
     }
 
+    fun getAllCountry()=favLocalDataSource.getUpdatedData()
+    suspend fun delete(favCity: FavCity){
+        favLocalDataSource.deleteData(favCity)
+    }
+    suspend fun  saveFavcity(favCity: FavCity){
+        favLocalDataSource.insertData(favCity)
 
-    suspend fun setLanguage(lang: String) {
-        UserSettings.setLanguage(context, lang)
+    }
+    suspend fun getAllCountryOnce(): List<FavCity> = favLocalDataSource.getAllCountryOnce()
+    suspend fun refreshFavData(units: String, lang: String) {
+        val cities = getAllCountryOnce()
+        if (cities.isEmpty()) return
+        coroutineScope {
+            cities.map { city ->
+                async {
+                    runCatching {
+                        Log.d("APIUNIT",units)
+                        val response = weatherDataSource.getWeatherCountryInfo(lat = city.lat, lon = city.long, units=units, lang = lang)
+                        Log.d("APIUNIT","get the value ${units}")
+
+                        val forecastData = response.getOrThrow()
+                        Log.d("APIUNIT","get the value ${response.getOrThrow()}")
+
+                        favLocalDataSource.insertData(
+
+                            city.copy(
+                                name = forecastData.city.name,
+                                countryCode = forecastData.city.country,
+                                temp = forecastData.list.first().main.temp,
+                                tempDescription = forecastData.list.first().weather.firstOrNull()?.description ?: ""
+                            )
+                        )
+                    }
+                }
+            }.awaitAll()
+        }
     }
 
-    fun getLanguage(): Flow<String> {
-        return UserSettings.getLanguage(context)
-    }
-
-    suspend fun setTempUnit(unit: String) {
-        UserSettings.setTempUnit(context, unit)
-    }
-
-    fun getTempUnit(): Flow<String> {
-        return UserSettings.getTempUnit(context)
-    }
-
-    suspend fun setWindUnit(unit: String) {
-        UserSettings.setWindUnit(context, unit)
-    }
-
-    fun getWindUnit(): Flow<String> {
-        return UserSettings.getWindUnit(context)
-    }
 
 
 }

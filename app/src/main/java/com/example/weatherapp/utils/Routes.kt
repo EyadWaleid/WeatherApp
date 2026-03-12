@@ -11,4 +11,7 @@ sealed class   Route {
     object  AlertScreen: Route()
     @Serializable
     object  DiscoverScreen: Route()
+    @Serializable
+    data class  FullUi(val mode: String): Route()
+
 }

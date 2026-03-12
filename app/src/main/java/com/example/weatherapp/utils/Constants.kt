@@ -11,9 +11,9 @@ object Constants{
             route = Route.HomeScreen
         ),
         BottomNaveItem(
-            name = R.string.setting,
-            icon = R.drawable.weathersettings,
-            route = Route.SettingsScreen
+            name = R.string.dicover,
+            icon = R.drawable.earth,
+            route = Route.DiscoverScreen
         ),
         BottomNaveItem(
             name = R.string.alert,
@@ -21,12 +21,10 @@ object Constants{
             route = Route.AlertScreen
         ),
         BottomNaveItem(
-            name = R.string.dicover,
-            icon = R.drawable.earth,
-            route = Route.DiscoverScreen
-        )
-
-
+            name = R.string.setting,
+            icon = R.drawable.weathersettings,
+            route = Route.SettingsScreen
+        ),
     )
     val ApiKey="a71745f051e01ebdb134fb48009e6027"
 

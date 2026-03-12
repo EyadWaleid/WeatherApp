@@ -11,7 +11,6 @@ class WeatherLocalDatasource(context: Context) {
 
     suspend fun insertForecast(forecast: CountryForecast) =
         forecastDao.insertForecast(forecast)
-
-    fun getForecast(): Flow<CountryForecast?> =
+    suspend fun getForecast():CountryForecast? =
         forecastDao.getForecast()
 }

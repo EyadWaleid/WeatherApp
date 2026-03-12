@@ -20,6 +20,8 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,9 +50,26 @@ import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.utils.Language
 import com.example.weatherapp.utils.TempUnits
 import com.example.weatherapp.utils.Units
+import kotlinx.coroutines.launch
+
 @Composable
-fun  SettingScreen(modifier: Modifier= Modifier,settingViewModel: SettingViewModel){
-    val userSettingsState by settingViewModel.settingsState.collectAsState()
+fun  SettingScreen(modifier: Modifier= Modifier,settingViewModel: SettingViewModel,snackbarHostState: SnackbarHostState){
+    val userSettingsState by settingViewModel.settingsState.collectAsState() // ✅ settingsState
+    val snackbarEvent by settingViewModel.snackbarEvent.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(snackbarEvent) {
+        snackbarEvent?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = it,
+                    duration = SnackbarDuration.Short,
+
+                )
+                settingViewModel.clearEvent()
+            }
+        }
+    }
    when(userSettingsState){
        is SettingViewModel.SettingsState.Data -> {
            Column (modifier = modifier.fillMaxSize().background(colorResource(R.color.darkBlue)).padding(8.dp),
@@ -188,16 +208,16 @@ fun LocationTrackerBtnToggle(modifier: Modifier= Modifier){
 }
 @Composable
 fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onClick:(Int)-> Unit){
-    var selectedIndex by remember { mutableStateOf(0) }
 
-    LaunchedEffect(tempUInt) {
-        selectedIndex = when (tempUInt) {
+
+
+       val selectedIndex = when (tempUInt) {
             TempUnits.CELSIUS.displayName -> 0
             TempUnits.FAHRENHEIT.displayName -> 1
             TempUnits.KELVIN.displayName -> 2
             else -> 0
         }
-    }
+
     val options = listOf(R.string.celsius, R.string.fahrenheit,R.string.kelvin)
     Box(
         modifier = Modifier
@@ -233,7 +253,6 @@ fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onCl
                                 Color.Transparent
                         ).clickable {
                         if(selectedIndex!=index){
-                                selectedIndex=index
                                 onClick(index)
                             }
                             },
@@ -308,7 +327,7 @@ fun WindUnitsBtnToggle(modifier: Modifier= Modifier,onClick: (Int) -> Unit , win
                                 Color.Transparent
                         )
 
-                        .clickable { selectedIndex = index
+                        .clickable {
                             onClick(index)},
                     contentAlignment = Alignment.Center
                 ) {

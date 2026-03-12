@@ -26,4 +26,5 @@
     <string name="display_language">Display language</string>
     <string name="now">Now</string>
     <string name="forecast_days">5-Day Forecast</string>
+    <string name="noData">Start discovering new cities</string>
 </resources>

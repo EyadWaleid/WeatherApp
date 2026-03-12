@@ -10,11 +10,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.util.copy
 import com.example.weatherapp.data.model.DailyWeather
 import com.example.weatherapp.data.model.HourlyWeather
+import com.example.weatherapp.data.repo.SettingsRepo
 import com.example.weatherapp.data.repo.WeatherHomeRepo
 import com.example.weatherapp.utils.LocationHelper
 import com.example.weatherapp.utils.TempUnits
 import com.example.weatherapp.utils.Units
 import com.example.weatherapp.utils.WeatherMapper.convertWind
+import com.example.weatherapp.utils.WeatherMapper.getUnits
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -23,6 +25,7 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.O)
 class WeatherViewModel(context: Application) : ViewModel() {
     val repo = WeatherHomeRepo(context = context)
+    val userSettingsRepo= SettingsRepo(context=context)
     @RequiresApi(Build.VERSION_CODES.O)
     val locationProvider = LocationHelper(context)
     private val _locationFlow = MutableStateFlow<WeatherState>(WeatherState.IsLoading)
@@ -33,15 +36,13 @@ class WeatherViewModel(context: Application) : ViewModel() {
     init {
         viewModelScope.launch {
             combine(
-                repo.getTempUnit(),
-                repo.getLanguage(),
-                repo.getWindUnit()
+                userSettingsRepo.getTempUnit(),
+                userSettingsRepo.getLanguage(),
+                userSettingsRepo.getWindUnit(),
+
             ){
-
                 temp,lang,wind->
-                Triple(temp,lang,wind)
-
-            }.collect {
+                Triple(temp,lang,wind) }.collect {
                     (temp ,lang,wind)->
                 _currentUnit.value=getUnits(temp)
                 _currentLang.value=lang
@@ -63,13 +64,11 @@ class WeatherViewModel(context: Application) : ViewModel() {
                         )
                 }
                     else{
-                        Log.d("LAN",lang+" inside the viewModel")
 
                         fetchLocation(unit = getUnits(temp),lang=lang)
                     }
                 }
                 else{
-                    Log.d("LAN",lang+" inside the viewModel")
                     fetchLocation(getUnits(temp),lang)
                 }
 
@@ -77,6 +76,7 @@ class WeatherViewModel(context: Application) : ViewModel() {
                 }
         }
     }
+
     fun refreshLocation(){
         fetchLocation( unit = _currentUnit.value,lang=_currentLang.value)
     }
@@ -97,7 +97,6 @@ class WeatherViewModel(context: Application) : ViewModel() {
                 try {
                     val location = locationProvider.getUserLocation()
                     if (location != null) {
-                        Log.d("LAN",lang+" inside the viewModel")
 
                         loadWeatherData(location,unit,lang)
                     } else {
@@ -110,47 +109,37 @@ class WeatherViewModel(context: Application) : ViewModel() {
             }
         }
     }
-   private suspend fun loadWeatherData(location: Location,unit: String,lang: String) {
-        repo.loadCountryWeatherData(location.longitude, location.latitude, units = unit , lang = lang)
-            .collect { result ->
-                _locationFlow.value = result.fold(
-                    onSuccess = { response ->
-                        val convertedDays = when {
-                            _currentUnit.value == "imperial" && _currentWindUnit.value == Units.METERS_PER_SECOND.displayName -> {
-                                response.weatherOfDays.map { it.copy(wind = it.wind / 2.237) }
-                            }
-                            _currentUnit.value != "imperial" && _currentWindUnit.value == Units.MILES_PER_HOUR.displayName -> {
-                                response.weatherOfDays.map { it.copy(wind = it.wind * 2.237 )}
-
-                            }
-                            else ->  response.weatherOfDays
-                        }
-                        WeatherState.WeatherData(
-                            dailyWeatherData =convertedDays.drop(1) ,
-                            hourlyWeather = convertedDays.get(0).hoursOfDayForecast ,
-                            weather = convertedDays.get(0),
-                            city = response.city,
-                            country = response.countryCode,
-                            windUnit = _currentWindUnit.value,
-                            tempUnit = _currentUnit.value
-
-                        )
-                    },
-                    onFailure = { WeatherState.OnError(it.message ?: "Unknown error") }
-                )
-            }
-    }
-   private  fun getUnits(unit: String):String{
-        Log.d("Units","My unit now is : $unit")
-        if(unit == TempUnits.FAHRENHEIT.displayName){
-         return  "imperial"
+    private fun loadWeatherData(location: Location, unit: String, lang: String) {
+        viewModelScope.launch {
+            val result = repo.loadCountryWeatherData(
+                lon = location.longitude,
+                lat = location.latitude,
+                units = unit,
+                lang = lang
+            )
+            _locationFlow.value = result.fold(
+                onSuccess = { response ->
+                    val convertedDays = when {
+                        _currentUnit.value == "imperial" && _currentWindUnit.value == Units.METERS_PER_SECOND.displayName ->
+                            response.weatherOfDays.map { it.copy(wind = it.wind / 2.237) }
+                        _currentUnit.value != "imperial" && _currentWindUnit.value == Units.MILES_PER_HOUR.displayName ->
+                            response.weatherOfDays.map { it.copy(wind = it.wind * 2.237) }
+                        else -> response.weatherOfDays
+                    }
+                    WeatherState.WeatherData(
+                        dailyWeatherData = convertedDays.drop(1),
+                        hourlyWeather = convertedDays.first().hoursOfDayForecast,
+                        weather = convertedDays.first(),
+                        city = response.city,
+                        country = response.countryCode,
+                        windUnit = _currentWindUnit.value,
+                        tempUnit = _currentUnit.value
+                    )
+                },
+                onFailure = { WeatherState.OnError(it.message ?: "Unknown error") }
+            )
         }
-        if(unit== TempUnits.KELVIN.displayName){
-            return  "standard"
-        }
-        return "metric"
     }
-
     sealed class WeatherState {
         object IsLoading : WeatherState()
         object PermissionDisabled : WeatherState()

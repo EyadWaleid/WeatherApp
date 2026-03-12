@@ -27,4 +27,5 @@
     <string name="display_language">لغة العرض</string>
     <string name="now">الأن</string>
     <string name="forecast_days">توقعات الطقس لخمسة  أيام</string>
+    <string name="noData">أكتشف مدن جديدة</string>
 </resources>

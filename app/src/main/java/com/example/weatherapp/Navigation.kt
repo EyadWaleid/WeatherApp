@@ -1,24 +1,29 @@
 package com.example.weatherapp
-
 import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.weatherapp.screens.alert.AlertScreen
-import com.example.weatherapp.screens.discoverScreen.DiscoverScreen
+import com.example.weatherapp.screens.discoverScreen.view.DiscoverScreen
 import com.example.weatherapp.screens.home.view.HomeScreen
 import com.example.weatherapp.screens.settings.view.SettingScreen
 import com.example.weatherapp.utils.Route
 import androidx.compose.runtime.collectAsState
-import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
+import androidx.navigation.toRoute
+import com.example.weatherapp.data.model.FavCity
+import com.example.weatherapp.screens.discoverScreen.viewmodel.DiscoverViewModel
 import com.example.weatherapp.screens.home.view_model.WeatherViewModel
+import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
+import com.example.weatherapp.screens.mapScreen.view.FullUi
+import com.example.weatherapp.screens.mapScreen.viewmodel.MapViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("RestrictedApi")
@@ -27,7 +32,11 @@ fun Navigation(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     weatherViewModel: WeatherViewModel,
-    settingViewModel: SettingViewModel
+    discoverViewModel: DiscoverViewModel,
+    settingViewModel: SettingViewModel,
+    mapViewModel: MapViewModel,
+    snackbarHostState: SnackbarHostState,
+
 ) {
     Log.d("Screen","The backStack size :- ${navHostController.currentBackStack.collectAsState().value.size}")
 
@@ -62,8 +71,30 @@ fun Navigation(
     ) {
 
         composable<Route.HomeScreen> { HomeScreen(modifier = modifier,weatherViewModel) }
-        composable<Route.SettingsScreen> { SettingScreen(modifier=modifier, settingViewModel = settingViewModel) }
+        composable<Route.SettingsScreen> { SettingScreen(modifier=modifier, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState) }
         composable<Route.AlertScreen> { AlertScreen(modifier=modifier) }
-        composable<Route.DiscoverScreen> { DiscoverScreen(modifier = modifier) }
+        composable<Route.DiscoverScreen> { DiscoverScreen(modifier = modifier, discoverViewModel = discoverViewModel) }
+        composable <Route.FullUi>{
+            backStackEntry->
+            val mode = backStackEntry.toRoute<Route.FullUi>().mode
+            FullUi(
+                modifier = modifier,
+                mode = mode,
+                mapViewModel = mapViewModel,
+                onClick = {
+                        when (mode) {
+                            "fav" -> discoverViewModel.saveFavCity(
+                                it,
+                                address =""
+                            )
+                            "home" ->  mapViewModel.saveForecastData(FavCity(name = "", countryCode = "", temp = 0.0, long = 0.0, tempDescription = "", lat = 0.0))
+                        }
+
+                    navHostController.popBackStack() },
+
+            )
+
+            }
     }
 }
+

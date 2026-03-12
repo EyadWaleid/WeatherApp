@@ -1,7 +1,5 @@
 package com.example.weatherapp.utils
-
 import android.app.Activity
-import android.app.Application
 import android.app.LocaleManager
 import android.content.Context
 import android.content.res.Configuration
@@ -9,7 +7,6 @@ import android.os.Build
 import android.os.LocaleList
 import java.util.Locale
 import androidx.core.content.edit
-
 object AppLocalization {
 
         fun changeLanguage(context: Activity, languageCode: String) {
