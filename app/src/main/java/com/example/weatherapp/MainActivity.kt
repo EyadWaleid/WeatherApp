@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
 
                             }
                         }) { innerPadding ->
-                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState, discoverViewModel = discoverViewModel, mapViewModel = mapViewModel, context = this.application)
+                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState, discoverViewModel = discoverViewModel, context = this.application)
 
 
                 }

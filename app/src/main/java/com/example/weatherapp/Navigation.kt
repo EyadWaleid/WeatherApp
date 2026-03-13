@@ -29,6 +29,7 @@ import com.example.weatherapp.screens.discover.viewmodel.DiscoverViewModel
 import com.example.weatherapp.screens.home.view_model.WeatherViewModel
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.screens.map.view.FullUi
+import com.example.weatherapp.screens.map.viewmodel.MapFactory
 import com.example.weatherapp.screens.map.viewmodel.MapViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -40,7 +41,6 @@ fun Navigation(
     weatherViewModel: WeatherViewModel,
     discoverViewModel: DiscoverViewModel,
     settingViewModel: SettingViewModel,
-    mapViewModel: MapViewModel,
     context: Application,
     snackbarHostState: SnackbarHostState,
 
@@ -101,28 +101,24 @@ fun Navigation(
         }
         composable<Route.FullUi> { backStackEntry ->
             val mode = backStackEntry.toRoute<Route.FullUi>().mode
+            val mapViewModel: MapViewModel = viewModel(
+                factory = MapFactory(context)
+            )
             FullUi(
                 modifier = modifier,
                 mode = mode,
                 mapViewModel = mapViewModel,
-                onClick = {
+                onClick = { position, address ->
                     when (mode) {
-                        "fav" -> discoverViewModel.saveFavCity(
-                            it,
-                            address = ""
-                        )
-
+                        "fav" -> discoverViewModel.saveFavCity(position, address)
                         "settings" -> settingViewModel.setMapLocation(
-                            lon = it.longitude,
-                            lat = it.latitude
+                            lon = position.longitude,
+                            lat = position.latitude
                         )
                     }
-
                     navHostController.popBackStack()
-                },
-
-                )
-
+                }
+            )
         }
         composable<Route.DetailScreen> { backStackEntry ->
             val lat = backStackEntry.toRoute<Route.DetailScreen>().lat
