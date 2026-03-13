@@ -17,12 +17,14 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -34,18 +36,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.weatherapp.screens.discoverScreen.viewmodel.DiscoverFactoryModel
-import com.example.weatherapp.screens.discoverScreen.viewmodel.DiscoverViewModel
+import com.example.weatherapp.screens.discover.viewmodel.DiscoverFactoryModel
+import com.example.weatherapp.screens.discover.viewmodel.DiscoverViewModel
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModelFactory
 import com.example.weatherapp.screens.home.view_model.WeatherFactory
 import com.example.weatherapp.screens.home.view_model.WeatherViewModel
-import com.example.weatherapp.screens.mapScreen.viewmodel.MapFactory
-import com.example.weatherapp.screens.mapScreen.viewmodel.MapViewModel
+import com.example.weatherapp.screens.map.viewmodel.MapFactory
+import com.example.weatherapp.screens.map.viewmodel.MapViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.utils.Constants
 import com.example.weatherapp.utils.Route
-import org.maplibre.compose.expressions.ast.MapLiteral
+import com.example.weatherapp.utils.connectivity.NetworkMonitor
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -66,6 +69,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val currentRoute by navController.currentBackStackEntryAsState()
                 val currentDestination = currentRoute?.destination?.route
+                val scope = rememberCoroutineScope()
                     Scaffold(
                         snackbarHost = { SnackbarHost(snackbarHostState)},
                         floatingActionButton = {
@@ -73,6 +77,15 @@ class MainActivity : ComponentActivity() {
                                 FloatingActionButton(
                                    containerColor = colorResource(R.color.blue) ,
                                     onClick = {
+                                        if(!NetworkMonitor(this).isInternetAvailable()){
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    message = "Check your connectivity",
+                                                    duration = SnackbarDuration.Short
+                                                )
+                                            }
+                                            return@FloatingActionButton
+                                        }
 
                                         navController.navigate(Route.FullUi("fav"))
 
@@ -90,7 +103,7 @@ class MainActivity : ComponentActivity() {
 
                             }
                         }) { innerPadding ->
-                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState, discoverViewModel = discoverViewModel, mapViewModel = mapViewModel)
+                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState, discoverViewModel = discoverViewModel, mapViewModel = mapViewModel, context = this.application)
 
 
                 }

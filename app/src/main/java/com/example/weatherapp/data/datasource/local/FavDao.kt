@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.Flow
 interface FavDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavCity(favCity: FavCity)
-    @Query("SELECT * FROM fav_country")
+    @Query("SELECT * FROM fav_country ORDER BY createdAt DESC")
     suspend fun getAllCitiesOnce(): List<FavCity>
-    @Query("SELECT * FROM fav_country")
+    @Query("SELECT * FROM fav_country ORDER BY createdAt DESC")
     fun getAllCities(): Flow<List<FavCity>>
     @Delete
     suspend fun deleteCity(city: FavCity)

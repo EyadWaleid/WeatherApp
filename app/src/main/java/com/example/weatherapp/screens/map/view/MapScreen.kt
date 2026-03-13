@@ -1,4 +1,4 @@
-package com.example.weatherapp.screens.mapScreen.view
+package com.example.weatherapp.screens.map.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -23,8 +23,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
-import com.example.weatherapp.data.model.FavCity
-import com.example.weatherapp.screens.mapScreen.viewmodel.MapViewModel
+import com.example.weatherapp.screens.map.viewmodel.MapViewModel
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const

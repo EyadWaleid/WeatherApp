@@ -2,6 +2,7 @@ package com.example.weatherapp.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 @Entity(tableName = "fav_country")
 data class FavCity(
@@ -11,5 +12,6 @@ data class FavCity(
     val long: Double,
     val lat: Double,
     val temp: Double,
-    val tempDescription: String
+    val tempDescription: String,
+    val createdAt: Long = System.currentTimeMillis()
 )

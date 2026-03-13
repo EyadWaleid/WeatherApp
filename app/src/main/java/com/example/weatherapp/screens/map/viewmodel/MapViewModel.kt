@@ -1,4 +1,4 @@
-package com.example.weatherapp.screens.mapScreen.viewmodel
+package com.example.weatherapp.screens.map.viewmodel
 
 import android.app.Application
 import android.location.Address

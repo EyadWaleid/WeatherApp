@@ -1,9 +1,7 @@
-package com.example.weatherapp.screens.discoverScreen.view
+package com.example.weatherapp.screens.discover.view
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -39,13 +35,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
 import com.example.weatherapp.data.model.FavCity
-import com.example.weatherapp.screens.discoverScreen.view.shimmer.LoadingDiscover
-import com.example.weatherapp.screens.discoverScreen.viewmodel.DiscoverViewModel
+import com.example.weatherapp.screens.discover.view.shimmer.LoadingDiscover
+import com.example.weatherapp.screens.discover.viewmodel.DiscoverViewModel
 import com.example.weatherapp.utils.ThereIsNoData
 
 @Composable
-fun DiscoverScreen(modifier: Modifier = Modifier, discoverViewModel: DiscoverViewModel) {
+fun DiscoverScreen(modifier: Modifier = Modifier, discoverViewModel: DiscoverViewModel,onClickItem: (FavCity) -> Unit) {
     val discoverState by discoverViewModel.favState.collectAsState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -107,7 +104,10 @@ fun DiscoverScreen(modifier: Modifier = Modifier, discoverViewModel: DiscoverVie
                     items(data.size) {
                         CountryItem(city = data[it], onClick = { favCity ->
                             discoverViewModel.deleteFavCity(favCity = favCity)
+                        }, unit = (discoverState as DiscoverViewModel.FavState.Data).units, onClickItem = {
+                            onClickItem(it)
                         })
+
 
 
                     }
@@ -125,12 +125,15 @@ fun DiscoverScreen(modifier: Modifier = Modifier, discoverViewModel: DiscoverVie
 
 }
 @Composable
-fun CountryItem(modifier: Modifier = Modifier, city: FavCity, onClick: (FavCity) -> Unit) {
+fun CountryItem(modifier: Modifier = Modifier, city: FavCity, onClickItem:(FavCity)->Unit, onClick: (FavCity) -> Unit, unit: String) {
     Card(
         colors = CardDefaults.cardColors(
             colorResource(R.color.cardColour)
         ),
-        onClick = {},
+        onClick = {
+
+            onClickItem(city)
+        },
         border = BorderStroke(
             color = colorResource(R.color.storkeColour),
             width = 1.dp,
@@ -165,7 +168,11 @@ fun CountryItem(modifier: Modifier = Modifier, city: FavCity, onClick: (FavCity)
             }
             Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
                 Text(
-                    text = city.temp.toInt().toString(),
+                    text = city.temp.toInt().toString()+ when(unit) {
+                        "metric" -> "°C"
+                        "imperial" -> "°F"
+                        else -> "K"
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.whiteBlue)
                 )
