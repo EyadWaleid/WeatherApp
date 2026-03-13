@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,6 +24,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
+import com.example.weatherapp.screens.map.view.components.PlaceName
 import com.example.weatherapp.screens.map.viewmodel.MapViewModel
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
@@ -40,71 +42,70 @@ import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.style.rememberStyleState
 import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Position
-
 @Composable
 fun FullUi(
     modifier: Modifier = Modifier,
-    onClick: (Position) -> Unit,
+    onClick: (Position, String) -> Unit,
     mapViewModel: MapViewModel,
-    mode: Any
-){
-    val position by mapViewModel.selectedPosition.collectAsState()
-    val address by mapViewModel.address.collectAsState()
+    mode: String
+) {
+    val mapState by mapViewModel.mapState.collectAsState()
+
     Box(modifier = Modifier.fillMaxSize()) {
-        MapItem(onClick = {
-            mapViewModel.onMapClick(it)
-        })
-        PlaceName( Modifier
-            .align(Alignment.BottomCenter)
-            .padding(16.dp),position, onClick = {
 
-           /*     when (mode) {
-                    "fav" -> mapViewModel.saveCityData(
-                        FavCity(
-                            address,
-                            long = it.longitude,
-                            lat = it.latitude,
-                            temp = 0.0,
-                            tempDescription = "",
-                            countryCode = ""
-                        )
-                    )
-                    "location" -> mapViewModel.saveForecastData(       FavCity(
-                        address,
-                        long = it.longitude,
-                        lat = it.latitude,
-                        temp = 0.0,
-                        tempDescription = "",
-                        countryCode = ""
-                    ))
-                }*/
-                onClick(it)
-
-        }, place = address)
-    }
-}
-@Composable
-fun PlaceName(modifier: Modifier= Modifier,mypostion: Position,onClick: (Position) -> Unit,place: String){
-
-
-
-    Box (modifier.fillMaxWidth().clip(shape = RoundedCornerShape(15.dp)).background(color = colorResource(R.color.black))) {
-        Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-
-            Text("Your Country choice is ")
-
-            Text(place)
-            Button(onClick = {onClick(mypostion)}) {
-                Text("Add")
-            }
+        if (mapState !is MapViewModel.MapState.Loading) {
+            MapItem(
+                onClick = { mapViewModel.onMapClick(it) },
+                initialPosition = when (mapState) {
+                    is MapViewModel.MapState.LocationSelected ->
+                        (mapState as MapViewModel.MapState.LocationSelected).position
+                    else -> Position(31.2357, 30.0444)
+                }
+            )
         }
 
-    }
+        when (mapState) {
+            is MapViewModel.MapState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colorResource(R.color.darkBlue)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = colorResource(R.color.blue))
+                }
+            }
 
+            is MapViewModel.MapState.Idle -> {  }
+
+            is MapViewModel.MapState.LocationSelected -> {
+                val state = mapState as MapViewModel.MapState.LocationSelected
+                PlaceName(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                    mypostion = state.position,
+                    place = state.address,
+                    onClick = { onClick(state.position, state.address) }
+                )
+            }
+
+            is MapViewModel.MapState.Error -> {
+                Text(
+                    text = "Unknown Location",
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                )
+            }
+        }
+    }
 }
+
 @Composable
-fun MapItem(onClick:(Position)->Unit) {
-    val myLocation = Position(31.2357, 30.0444)
+fun MapItem(onClick: (Position) -> Unit, initialPosition: Position) {
+    val myLocation =initialPosition
     var markerPosition by remember { mutableStateOf(myLocation) }
     val pinIcon = painterResource(R.drawable.baseline_location_pin_24)
 
