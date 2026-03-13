@@ -1,4 +1,5 @@
 package com.example.weatherapp.screens.settings.view
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +21,8 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,18 +43,34 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherapp.R
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.utils.Language
+import com.example.weatherapp.utils.LocationSource
 import com.example.weatherapp.utils.TempUnits
 import com.example.weatherapp.utils.Units
+import kotlinx.coroutines.launch
+
 @Composable
-fun  SettingScreen(modifier: Modifier= Modifier,settingViewModel: SettingViewModel){
+fun  SettingScreen(modifier: Modifier= Modifier,settingViewModel: SettingViewModel,snackbarHostState: SnackbarHostState,onMapClick:()-> Unit){
     val userSettingsState by settingViewModel.settingsState.collectAsState()
-   when(userSettingsState){
+    val snackbarEvent by settingViewModel.snackbarEvent.collectAsState()
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(snackbarEvent) {
+        snackbarEvent?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = it,
+                    duration = SnackbarDuration.Short,
+                )
+                settingViewModel.clearEvent()
+            }
+        }
+    }
+   when(userSettingsState)
+    {
        is SettingViewModel.SettingsState.Data -> {
            Column (modifier = modifier.fillMaxSize().background(colorResource(R.color.darkBlue)).padding(8.dp),
            ) {
@@ -58,7 +78,13 @@ fun  SettingScreen(modifier: Modifier= Modifier,settingViewModel: SettingViewMod
                Spacer(modifier = Modifier.size(32.dp))
                Text(stringResource(R.string.location_source), color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
                Spacer(modifier = Modifier.size(12.dp))
-               LocationTrackerBtnToggle()
+               LocationTrackerBtnToggle(onClick = {
+
+
+                      onMapClick()
+
+
+               }, locationSource = (userSettingsState as SettingViewModel.SettingsState.Data).locationSource, settingViewModel = settingViewModel)
                Spacer(modifier = Modifier.size(32.dp))
                Text(stringResource(R.string.temperature_units), color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
                Spacer(modifier = Modifier.size(12.dp))
@@ -118,15 +144,18 @@ fun AppBar(modifier: Modifier= Modifier){
     }
 }
 @Composable
-fun LocationTrackerBtnToggle(modifier: Modifier= Modifier){
-    var selectedIndex by remember { mutableStateOf(0) }
+fun LocationTrackerBtnToggle(modifier: Modifier= Modifier,locationSource: String,onClick: () -> Unit,settingViewModel: SettingViewModel){
+    var selectedIndex = when(locationSource){
+         LocationSource.GPS.displayName-> 0
+        LocationSource.MAP.displayName->1
+        else -> {0}
+    }
 
-    val options = listOf("GPS", "Map")
+    val options = mutableListOf("GPS", "Map")
     val icons = listOf(
        R.drawable.baseline_location_pin_24,
         R.drawable.outline_map_24
     )
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,17 +169,15 @@ fun LocationTrackerBtnToggle(modifier: Modifier= Modifier){
             ).background(
               color = colorResource(R.color.darkBlueWithOpacity),
                 shape = RoundedCornerShape(15)
-
             )
             .padding(4.dp),
 
     ) {
-
         Row(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            options.forEachIndexed { index, label ->
+            options.forEachIndexed{ index, label ->
                 val isSelected = selectedIndex == index
                 Box(
                     modifier = Modifier
@@ -164,7 +191,20 @@ fun LocationTrackerBtnToggle(modifier: Modifier= Modifier){
                             else
                                 Color.Transparent
                         )
-                        .clickable { selectedIndex = index },
+                        .clickable {
+                            if( settingViewModel.checkConnectivity()){
+                                if(selectedIndex==index&&index==0){
+                                    return@clickable
+                                }
+                                else if(index==0){
+                                     settingViewModel.setLocationSourceToMap()
+                                    return@clickable
+                                }
+                                selectedIndex = index
+                                onClick()
+                            }
+
+                                  },
                     contentAlignment = Alignment.Center
                 ) {
                     Row(
@@ -188,16 +228,16 @@ fun LocationTrackerBtnToggle(modifier: Modifier= Modifier){
 }
 @Composable
 fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onClick:(Int)-> Unit){
-    var selectedIndex by remember { mutableStateOf(0) }
 
-    LaunchedEffect(tempUInt) {
-        selectedIndex = when (tempUInt) {
+
+
+       val selectedIndex = when (tempUInt) {
             TempUnits.CELSIUS.displayName -> 0
             TempUnits.FAHRENHEIT.displayName -> 1
             TempUnits.KELVIN.displayName -> 2
             else -> 0
         }
-    }
+
     val options = listOf(R.string.celsius, R.string.fahrenheit,R.string.kelvin)
     Box(
         modifier = Modifier
@@ -233,7 +273,6 @@ fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onCl
                                 Color.Transparent
                         ).clickable {
                         if(selectedIndex!=index){
-                                selectedIndex=index
                                 onClick(index)
                             }
                             },
@@ -308,7 +347,7 @@ fun WindUnitsBtnToggle(modifier: Modifier= Modifier,onClick: (Int) -> Unit , win
                                 Color.Transparent
                         )
 
-                        .clickable { selectedIndex = index
+                        .clickable {
                             onClick(index)},
                     contentAlignment = Alignment.Center
                 ) {

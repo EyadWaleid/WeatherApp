@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version "2.3.0"
     alias(libs.plugins.ksp)
 
 }
@@ -37,8 +37,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        jvmToolchain(11)
+    }
+    buildFeatures {
+        compose = true
     }
     buildFeatures {
         compose = true
@@ -49,6 +52,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.maplibre.compose)
+    implementation(libs.lottie.compose)
     implementation(libs.locationServices)
     implementation(libs.data.store.preferences)
     implementation(libs.retrofit)

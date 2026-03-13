@@ -11,14 +11,20 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -30,12 +36,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weatherapp.screens.discover.viewmodel.DiscoverFactoryModel
+import com.example.weatherapp.screens.discover.viewmodel.DiscoverViewModel
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModelFactory
 import com.example.weatherapp.screens.home.view_model.WeatherFactory
 import com.example.weatherapp.screens.home.view_model.WeatherViewModel
+import com.example.weatherapp.screens.map.viewmodel.MapFactory
+import com.example.weatherapp.screens.map.viewmodel.MapViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.utils.Constants
+import com.example.weatherapp.utils.Route
+import com.example.weatherapp.utils.connectivity.NetworkMonitor
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -45,16 +58,52 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+
+            val  discoverViewModel: DiscoverViewModel=viewModel(factory = DiscoverFactoryModel(this.application))
             val weahtherViewModel: WeatherViewModel= viewModel(factory = WeatherFactory(context = this.application))
             val settingViewModel: SettingViewModel=viewModel  (factory = SettingViewModelFactory(context = this.application,this))
+            val mapViewModel: MapViewModel=viewModel(factory = MapFactory(context = this.application))
+            val snackbarHostState = remember { SnackbarHostState() }
 
             WeatherAppTheme {
                 val navController = rememberNavController()
-
+                val currentRoute by navController.currentBackStackEntryAsState()
+                val currentDestination = currentRoute?.destination?.route
+                val scope = rememberCoroutineScope()
                     Scaffold(
+                        snackbarHost = { SnackbarHost(snackbarHostState)},
+                        floatingActionButton = {
+                            if(currentDestination?.contains("DiscoverScreen") == true){
+                                FloatingActionButton(
+                                   containerColor = colorResource(R.color.blue) ,
+                                    onClick = {
+                                        if(!NetworkMonitor(this).isInternetAvailable()){
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    message = "Check your connectivity",
+                                                    duration = SnackbarDuration.Short
+                                                )
+                                            }
+                                            return@FloatingActionButton
+                                        }
+
+                                        navController.navigate(Route.FullUi("fav"))
+
+                                    }
+                                ) {
+                                    Icon(painter = painterResource(R.drawable.outline_map_24), "Floating action button")
+                                }
+                            }
+
+                        },
                         modifier = Modifier.fillMaxSize(),
-                        bottomBar = { BottomNavigationBar(navController = navController) }) { innerPadding ->
-                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel,settingViewModel)
+                        bottomBar = {
+                            if(currentDestination?.contains("FullUi") == false){
+                                BottomNavigationBar(navController = navController)
+
+                            }
+                        }) { innerPadding ->
+                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState, discoverViewModel = discoverViewModel, mapViewModel = mapViewModel, context = this.application)
 
 
                 }
@@ -89,7 +138,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     WeatherAppTheme {
-        Greeting("Android")
     }
 }
 
@@ -98,49 +146,36 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar(
 
-        // set background color
         containerColor = colorResource(R.color.darkBlue)
     ) {
 
-        // observe the backstack
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-
-        // observe current route to change the icon
-        // color,label color when navigated
         val currentRoute = navBackStackEntry?.destination?.route
 
-        // Bottom nav items we declared
         Constants.BottomNavItems.forEach { navItem ->
 
-            // Place the bottom nav items
             NavigationBarItem(
 
-                // it currentRoute is equal then its selected route
                 selected = currentRoute == navItem.route::class.qualifiedName,
 
-                // navigate on click
                 onClick = {
                     if (currentRoute != navItem.route::class.qualifiedName){
                         navController.navigate(navItem.route){
                             launchSingleTop = true
-
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
 
-                            /*         // Restore previous state
-                                     restoreState = true*/
+
 
                         }
                     }
                 },
 
-                // Icon of navItem
                 icon = {
                     Icon(painter = painterResource(navItem.icon), contentDescription = stringResource( navItem.name), modifier = Modifier.size(20.dp))
                 },
 
-                // label
                 label = {
                     Text(text = stringResource( navItem.name))
                 },

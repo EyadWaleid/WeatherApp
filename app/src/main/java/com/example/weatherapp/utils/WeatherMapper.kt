@@ -127,4 +127,15 @@ object WeatherMapper {
             else -> wind
         }
     }
+      fun getUnits(unit: String):String{
+        Log.d("Units","My unit now is : $unit")
+        if(unit == TempUnits.FAHRENHEIT.displayName){
+            return  "imperial"
+        }
+        if(unit== TempUnits.KELVIN.displayName){
+            return  "standard"
+        }
+        return "metric"
+    }
+
 }

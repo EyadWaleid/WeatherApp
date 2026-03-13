@@ -13,5 +13,6 @@ interface ForecastDao {
     suspend fun insertForecast(forecast: CountryForecast)
 
     @Query("SELECT * FROM country_forecast LIMIT 1")
-    fun getForecast(): Flow<CountryForecast?>
+    suspend fun getForecast(): CountryForecast?
+
 }

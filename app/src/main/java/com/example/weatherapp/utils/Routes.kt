@@ -1,5 +1,6 @@
 package com.example.weatherapp.utils
 
+import com.example.weatherapp.data.model.FavCity
 import kotlinx.serialization.Serializable
 
 sealed class   Route {
@@ -11,4 +12,8 @@ sealed class   Route {
     object  AlertScreen: Route()
     @Serializable
     object  DiscoverScreen: Route()
+    @Serializable
+    data class  FullUi(val mode: String): Route()
+    @Serializable
+    data class DetailScreen(val  long: Double,val lat: Double)
 }
