@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.repo.SettingsRepo
 import com.example.weatherapp.utils.AppLocalization
-import com.example.weatherapp.utils.LocationSource
-import com.example.weatherapp.utils.UserSettings
+import com.example.weatherapp.utils.constants.LocationSource
+import com.example.weatherapp.utils.constants.UserSettings
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

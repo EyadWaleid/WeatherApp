@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
 import com.example.weatherapp.data.model.entity.HourlyWeather
-import com.example.weatherapp.utils.WeatherIcon
+import com.example.weatherapp.utils.constants.WeatherIcon
 
 @Composable
 fun HourlyWeather(modifier: Modifier= Modifier,hourlyWeather: List<HourlyWeather> ,tempUnits: String){

@@ -15,7 +15,7 @@ import com.example.weatherapp.screens.alert.view.AlertScreen
 import com.example.weatherapp.screens.discover.view.DiscoverScreen
 import com.example.weatherapp.screens.home.view.HomeScreen
 import com.example.weatherapp.screens.settings.view.SettingScreen
-import com.example.weatherapp.utils.Route
+import com.example.weatherapp.utils.routes.Route
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.toRoute
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModel
@@ -104,7 +104,7 @@ fun Navigation(
             popExitTransition = {
                 slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(250))
             }
-        ) { AlertScreen(modifier = modifier, alertViewModel = alertViewModel) }
+        ) { AlertScreen(modifier = modifier, alertViewModel = alertViewModel,snackbarHostState) }
 
         composable<Route.DiscoverScreen>(
             enterTransition = {

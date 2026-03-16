@@ -1,7 +1,8 @@
-package com.example.weatherapp.utils
+package com.example.weatherapp.utils.constants
 
 import com.example.weatherapp.BottomNaveItem
 import com.example.weatherapp.R
+import com.example.weatherapp.utils.routes.Route
 
 object Constants{
     val  BottomNavItems=listOf<BottomNaveItem>(
@@ -26,6 +27,5 @@ object Constants{
             route = Route.SettingsScreen
         ),
     )
-    val ApiKey="a71745f051e01ebdb134fb48009e6027"
 
 }

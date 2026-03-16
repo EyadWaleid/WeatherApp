@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.model.entity.FavCity
 import com.example.weatherapp.data.repo.SettingsRepo
 import com.example.weatherapp.data.repo.WeatherHomeRepo
-import com.example.weatherapp.utils.UserSettings
+import com.example.weatherapp.utils.constants.UserSettings
 import com.example.weatherapp.utils.WeatherMapper.getUnits
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow

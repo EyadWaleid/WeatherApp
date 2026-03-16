@@ -16,6 +16,7 @@ import com.example.weatherapp.NotificationWorkManager
 import com.example.weatherapp.WorkerKeys
 import com.example.weatherapp.data.datasource.local.datasource.AlarmDataSource
 import com.example.weatherapp.data.model.entity.UserAlerts
+import com.example.weatherapp.utils.constants.TimeUtils.calculateDelay
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
@@ -40,7 +41,6 @@ class AlertRepo(private val context: Application) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun scheduleAlarm(alarm: UserAlerts) {
-        Log.d("TEMP","Start scheduling ${alarm.id.toInt()}")
 
         val delay = calculateDelay(alarm.from)
         val constraints = Constraints.Builder()
@@ -54,7 +54,7 @@ class AlertRepo(private val context: Application) {
             .putString(WorkerKeys.TO.key, alarm.to)
             .build()
         val workRequest = PeriodicWorkRequestBuilder<NotificationWorkManager>(15, TimeUnit.MINUTES)
-            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setInitialDelay(delay, TimeUnit.SECONDS)
             .setInputData(inputData)
             .addTag(alarm.id.toString())
             .setConstraints(constraints)
@@ -65,18 +65,7 @@ class AlertRepo(private val context: Application) {
             workRequest
         )    }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun calculateDelay(from: String): Long {
-        val now = LocalTime.now()
-        val target = LocalTime.parse(from)
-        val nowSeconds = now.toSecondOfDay()
-        val targetSeconds = target.toSecondOfDay()
-        return if (targetSeconds > nowSeconds) {
-            (targetSeconds - nowSeconds) * 1000L
-        } else {
-            (86400 - nowSeconds + targetSeconds) * 1000L
-        }
-    }
+
 
     suspend fun turnOffAlarm(alarmId: Long) {
         val alarm = alarmDataSource.getAlarmById(alarmId)

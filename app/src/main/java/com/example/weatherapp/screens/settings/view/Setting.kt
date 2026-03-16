@@ -1,6 +1,5 @@
 package com.example.weatherapp.screens.settings.view
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,10 +47,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherapp.R
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
-import com.example.weatherapp.utils.Language
-import com.example.weatherapp.utils.LocationSource
-import com.example.weatherapp.utils.TempUnits
-import com.example.weatherapp.utils.Units
+import com.example.weatherapp.utils.constants.Language
+import com.example.weatherapp.utils.constants.LocationSource
+import com.example.weatherapp.utils.constants.TempUnits
+import com.example.weatherapp.utils.constants.Units
 import kotlinx.coroutines.launch
 
 @Composable
