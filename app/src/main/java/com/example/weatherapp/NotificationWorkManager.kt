@@ -12,14 +12,13 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.weatherapp.data.model.entity.CountryForecast
-import com.example.weatherapp.data.repo.SettingsRepo
-import com.example.weatherapp.data.repo.WeatherHomeRepo
+import com.example.weatherapp.data.repo.settings.SettingsRepo
+import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
 import com.example.weatherapp.utils.location.LocationHelper
 import com.example.weatherapp.utils.constants.LocationSource
 import com.example.weatherapp.utils.WeatherMapper.getUnits
 import kotlinx.coroutines.flow.first
 import java.time.LocalTime
-import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 

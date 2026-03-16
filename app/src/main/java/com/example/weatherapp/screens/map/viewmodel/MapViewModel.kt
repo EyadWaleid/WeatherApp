@@ -7,12 +7,10 @@ import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.weatherapp.data.model.entity.FavCity
-import com.example.weatherapp.data.repo.SettingsRepo
-import com.example.weatherapp.data.repo.WeatherHomeRepo
+import com.example.weatherapp.data.repo.settings.SettingsRepo
+import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
 import com.example.weatherapp.utils.location.LocationHelper
 import com.example.weatherapp.utils.constants.LocationSource
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first

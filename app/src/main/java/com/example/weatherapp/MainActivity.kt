@@ -1,6 +1,5 @@
 package com.example.weatherapp
 
-import android.Manifest
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -38,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModel
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModelFactory
 import com.example.weatherapp.screens.discover.viewmodel.DiscoverFactoryModel
@@ -50,6 +50,7 @@ import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.utils.constants.Constants
 import com.example.weatherapp.utils.routes.Route
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
+import com.example.weatherapp.utils.localization.AppLocalization
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -61,51 +62,77 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-
-            val  discoverViewModel: DiscoverViewModel=viewModel(factory = DiscoverFactoryModel(this.application))
-            val weahtherViewModel: HomeViewModel= viewModel(factory = WeatherFactory(context = this.application))
-            val settingViewModel: SettingViewModel=viewModel  (factory = SettingViewModelFactory(context = this.application,this))
+            val settingsRepo = SettingsRepo(application)
+            val networkMonitor = NetworkMonitor(application)
+            val localizationManager = AppLocalization(this)
+            val discoverViewModel: DiscoverViewModel =
+                viewModel(factory = DiscoverFactoryModel(this.application))
+            val weahtherViewModel: HomeViewModel =
+                viewModel(factory = WeatherFactory(context = this.application))
+            val settingViewModel: SettingViewModel = viewModel(
+                factory = SettingViewModelFactory(
+                    settingsRepo = settingsRepo,
+                    networkMonitor = networkMonitor,
+                    appLocalization = localizationManager
+                )
+            )
             val snackbarHostState = remember { SnackbarHostState() }
-            val alertViewModel: AlertViewModel=viewModel (factory = AlertViewModelFactory(context = this.application))
+            val alertViewModel: AlertViewModel =
+                viewModel(factory = AlertViewModelFactory(context = this.application))
             WeatherAppTheme {
                 val navController = rememberNavController()
                 val currentRoute by navController.currentBackStackEntryAsState()
                 val currentDestination = currentRoute?.destination?.route
                 val scope = rememberCoroutineScope()
-                    Scaffold(
-                        snackbarHost = { SnackbarHost(snackbarHostState)},
-                        floatingActionButton = {
-                            if(currentDestination?.contains("DiscoverScreen") == true){
-                                FloatingActionButton(
-                                   containerColor = colorResource(R.color.blue) ,
-                                    onClick = {
-                                        if(!NetworkMonitor(this).isInternetAvailable()){
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar(
-                                                    message = "Check your connectivity",
-                                                    duration = SnackbarDuration.Short
-                                                )
-                                            }
-                                            return@FloatingActionButton
+                Scaffold(
+                    snackbarHost = { SnackbarHost(snackbarHostState) },
+                    floatingActionButton = {
+                        if (currentDestination?.contains("DiscoverScreen") == true) {
+                            FloatingActionButton(
+                                containerColor = colorResource(R.color.blue),
+                                onClick = {
+                                    if (!NetworkMonitor(this).isInternetAvailable()) {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Check your connectivity",
+                                                duration = SnackbarDuration.Short
+                                            )
                                         }
-
-                                        navController.navigate(Route.FullUi("fav"))
-
+                                        return@FloatingActionButton
                                     }
-                                ) {
-                                    Icon(painter = painterResource(R.drawable.outline_map_24), "Floating action button")
+
+                                    navController.navigate(Route.FullUi("fav"))
+
                                 }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.outline_map_24),
+                                    "Floating action button"
+                                )
                             }
+                        }
 
-                        },
-                        modifier = Modifier.fillMaxSize(),
-                        bottomBar = {
-                            if(currentDestination?.contains("FullUi") == false && currentDestination?.contains("DetailScreen") == false){
-                                BottomNavigationBar(navController = navController)
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        if (currentDestination?.contains("FullUi") == false && currentDestination?.contains(
+                                "DetailScreen"
+                            ) == false
+                        ) {
+                            BottomNavigationBar(navController = navController)
 
-                            }
-                        }) { innerPadding ->
-                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState, discoverViewModel = discoverViewModel, alertViewModel = alertViewModel,context = this.application)
+                        }
+                    }) { innerPadding ->
+                    Navigation(
+                        navController,
+                        Modifier.padding(innerPadding),
+                        weahtherViewModel,
+                        settingViewModel = settingViewModel,
+                        snackbarHostState = snackbarHostState,
+                        discoverViewModel = discoverViewModel,
+                        alertViewModel = alertViewModel,
+                        context = this.application
+                    )
 
 
                 }
@@ -118,7 +145,7 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             super.attachBaseContext(base)
         } else {
-            val prefs = base.getSharedPreferences("language_prefs", Context.MODE_PRIVATE)
+            val prefs = base.getSharedPreferences("language_prefs", MODE_PRIVATE)
             val languageCode = prefs.getString("language", "en") ?: "en"
             val locale = Locale.forLanguageTag(languageCode)
             Locale.setDefault(locale)
@@ -162,13 +189,12 @@ fun BottomNavigationBar(navController: NavHostController) {
                 selected = currentRoute == navItem.route::class.qualifiedName,
 
                 onClick = {
-                    if (currentRoute != navItem.route::class.qualifiedName){
-                        navController.navigate(navItem.route){
+                    if (currentRoute != navItem.route::class.qualifiedName) {
+                        navController.navigate(navItem.route) {
                             launchSingleTop = true
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
-
 
 
                         }
@@ -176,18 +202,22 @@ fun BottomNavigationBar(navController: NavHostController) {
                 },
 
                 icon = {
-                    Icon(painter = painterResource(navItem.icon), contentDescription = stringResource( navItem.name), modifier = Modifier.size(20.dp))
+                    Icon(
+                        painter = painterResource(navItem.icon),
+                        contentDescription = stringResource(navItem.name),
+                        modifier = Modifier.size(20.dp)
+                    )
                 },
 
                 label = {
-                    Text(text = stringResource( navItem.name))
+                    Text(text = stringResource(navItem.name))
                 },
                 alwaysShowLabel = false,
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = colorResource(R.color.blue), // Icon color when selected
-                    unselectedIconColor =colorResource(R.color.greyBlue) , // Icon color when not selected
+                    unselectedIconColor = colorResource(R.color.greyBlue), // Icon color when not selected
                     selectedTextColor = Color.White, // Label color when selected
-                    indicatorColor=Color.Transparent,
+                    indicatorColor = Color.Transparent,
                 )
             )
         }

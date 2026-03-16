@@ -1,4 +1,4 @@
-package com.example.weatherapp.data.repo
+package com.example.weatherapp.data.repo.homeRepo
 
 import android.app.Application
 import android.os.Build
@@ -9,8 +9,7 @@ import com.example.weatherapp.data.datasource.local.datasource.WeatherLocalDatas
 import com.example.weatherapp.data.datasource.remote.WeatherDataSource
 import com.example.weatherapp.data.model.entity.CountryForecast
 import com.example.weatherapp.data.model.entity.FavCity
-
-import com.example.weatherapp.utils.WeatherMapper.mapToDailyWeather
+import com.example.weatherapp.utils.WeatherMapper
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -48,7 +47,7 @@ class WeatherHomeRepo(
                     long = forecastData.city.coord.lon,
                     lat = forecastData.city.coord.lat,
                     countryCode = forecastData.city.country,
-                    weatherOfDays = mapToDailyWeather(forecastData, lang = lang)
+                    weatherOfDays = WeatherMapper.mapToDailyWeather(forecastData, lang = lang)
                 )
 
 
@@ -93,8 +92,8 @@ class WeatherHomeRepo(
             city = forecastData.city.name,
             countryCode = forecastData.city.country,
             long = forecastData.city.coord.lon,
-            lat=forecastData.city.coord.lat,
-            weatherOfDays = mapToDailyWeather(forecastData, lang = lang)
+            lat = forecastData.city.coord.lat,
+            weatherOfDays = WeatherMapper.mapToDailyWeather(forecastData, lang = lang)
         )
     }
 

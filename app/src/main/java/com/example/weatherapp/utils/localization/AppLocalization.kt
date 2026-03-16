@@ -1,15 +1,16 @@
-package com.example.weatherapp.utils
+package com.example.weatherapp.utils.localization
+
 import android.app.Activity
 import android.app.LocaleManager
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.LocaleList
-import java.util.Locale
 import androidx.core.content.edit
-object AppLocalization {
+import java.util.Locale
 
-        fun changeLanguage(context: Activity, languageCode: String) {
+class AppLocalization(private val context: Activity): IAppLocalization {
+        override fun changeLanguage(languageCode: String) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.getSystemService(LocaleManager::class.java).applicationLocales =
                     LocaleList.forLanguageTags(languageCode)
@@ -24,11 +25,6 @@ object AppLocalization {
                 config.setLocale(locale)
                 context.createConfigurationContext(config)
                context.recreate()
-
-
             }
         }
-
-
-
 }
