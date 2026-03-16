@@ -20,16 +20,16 @@ class WeatherHomeRepo(
     val localDatasource: WeatherLocalDatasource = WeatherLocalDatasource(context.applicationContext),
     val favLocalDataSource: FavLocalDataSource = FavLocalDataSource(context = context),
 
-    ) {
+    ) : IWeatherHomeRepo{
 
 
     // Download the data to database and then View
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun loadCountryWeatherData(
+  override  suspend fun loadCountryWeatherData(
         lon: Double,
         lat: Double,
-        units: String = "metric",
-        lang: String = "en"
+        units: String,
+        lang: String,
     ): Result<CountryForecast> {
 
         return try {
@@ -64,7 +64,7 @@ class WeatherHomeRepo(
             }
         }
     }
-    suspend  fun getSavedWeatherForecast(): Result<CountryForecast>  {
+   override suspend  fun getSavedWeatherForecast(): Result<CountryForecast>  {
         return  runCatching {
             localDatasource.getForecast()
                 ?: throw Exception("No forecast saved in database")
@@ -73,11 +73,11 @@ class WeatherHomeRepo(
 
     // View Data from the Api
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun fetchCountryWeatherData(
+  override  suspend fun fetchCountryWeatherData(
         lon: Double,
         lat: Double,
-        units: String = "metric",
-        lang: String = "en"
+        units: String ,
+        lang: String
     ): Result<CountryForecast> = runCatching {
         val forecastData = weatherDataSource.getWeatherCountryInfo(
             lat = lat,
@@ -96,23 +96,23 @@ class WeatherHomeRepo(
     }
 
     // Observe the database of FavCountry table
-    fun getAllCountry() = favLocalDataSource.getUpdatedData()
+   override fun getAllCountry() = favLocalDataSource.getUpdatedData()
 
     // delete the FavCountry from the table
-    suspend fun delete(favCity: FavCity) {
+   override suspend fun delete(favCity: FavCity) {
         favLocalDataSource.deleteData(favCity)
     }
 
     // insert in database
-    suspend fun saveFavcity(favCity: FavCity) {
+  override  suspend fun saveFavcity(favCity: FavCity) {
         favLocalDataSource.insertData(favCity)
     }
 
     // get All data from database
-    suspend fun getAllCountryOnce(): List<FavCity> = favLocalDataSource.getAllCountryOnce()
+  override  suspend fun getAllCountryOnce(): List<FavCity> = favLocalDataSource.getAllCountryOnce()
 
     // Revalue the data from the Api
-    suspend fun refreshFavData(units: String, lang: String): Boolean {
+   override suspend fun refreshFavData(units: String, lang: String): Boolean {
         val cities = getAllCountryOnce()
         if (cities.isEmpty()) return false
         coroutineScope {

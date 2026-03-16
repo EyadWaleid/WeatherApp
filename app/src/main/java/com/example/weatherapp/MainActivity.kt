@@ -70,7 +70,11 @@ class MainActivity : ComponentActivity() {
             val locationHelper = LocationHelper(application)
             val localizationManager = AppLocalization(this)
             val discoverViewModel: DiscoverViewModel =
-                viewModel(factory = DiscoverFactoryModel(this.application))
+                viewModel(factory = DiscoverFactoryModel(
+                    userSettings = settingsRepo,
+                    repo =homeRepo,
+                    networkMonitor = networkMonitor,
+                ))
             val weahtherViewModel: HomeViewModel =
                 viewModel(
                     factory = WeatherFactory(
@@ -151,7 +155,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
     override fun attachBaseContext(base: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             super.attachBaseContext(base)
