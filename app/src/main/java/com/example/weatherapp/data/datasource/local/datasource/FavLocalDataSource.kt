@@ -1,8 +1,8 @@
-package com.example.weatherapp.data.datasource.local
+package com.example.weatherapp.data.datasource.local.datasource
 
 import android.app.Application
 import com.example.weatherapp.data.db.AppDatabase
-import com.example.weatherapp.data.model.FavCity
+import com.example.weatherapp.data.model.entity.FavCity
 import kotlinx.coroutines.flow.Flow
 
 class FavLocalDataSource(val  context: Application){

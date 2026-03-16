@@ -22,8 +22,9 @@ class SettingViewModel(
     private val _settingsState = MutableStateFlow<SettingsState>(SettingsState.Loading)
     private val settingsRepo= SettingsRepo(context=context)
     private val _snackbarEvent = MutableStateFlow<String?>(null)
-    val settingsState: StateFlow<SettingsState> = _settingsState
     val snackbarEvent: StateFlow<String?> = _snackbarEvent
+
+    val settingsState: StateFlow<SettingsState> = _settingsState
     init {
         observeSettings()
     }

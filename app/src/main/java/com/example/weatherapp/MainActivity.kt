@@ -1,5 +1,6 @@
 package com.example.weatherapp
 
+import android.Manifest
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -36,14 +37,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weatherapp.screens.alert.viewmodel.AlertViewModel
+import com.example.weatherapp.screens.alert.viewmodel.AlertViewModelFactory
 import com.example.weatherapp.screens.discover.viewmodel.DiscoverFactoryModel
 import com.example.weatherapp.screens.discover.viewmodel.DiscoverViewModel
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModelFactory
 import com.example.weatherapp.screens.home.view_model.WeatherFactory
-import com.example.weatherapp.screens.home.view_model.WeatherViewModel
-import com.example.weatherapp.screens.map.viewmodel.MapFactory
-import com.example.weatherapp.screens.map.viewmodel.MapViewModel
+import com.example.weatherapp.screens.home.view_model.HomeViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.utils.Constants
 import com.example.weatherapp.utils.Route
@@ -60,11 +61,10 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val  discoverViewModel: DiscoverViewModel=viewModel(factory = DiscoverFactoryModel(this.application))
-            val weahtherViewModel: WeatherViewModel= viewModel(factory = WeatherFactory(context = this.application))
+            val weahtherViewModel: HomeViewModel= viewModel(factory = WeatherFactory(context = this.application))
             val settingViewModel: SettingViewModel=viewModel  (factory = SettingViewModelFactory(context = this.application,this))
-            val mapViewModel: MapViewModel=viewModel(factory = MapFactory(context = this.application))
             val snackbarHostState = remember { SnackbarHostState() }
-
+            val alertViewModel: AlertViewModel=viewModel (factory = AlertViewModelFactory(context = this.application))
             WeatherAppTheme {
                 val navController = rememberNavController()
                 val currentRoute by navController.currentBackStackEntryAsState()
@@ -98,17 +98,24 @@ class MainActivity : ComponentActivity() {
                         },
                         modifier = Modifier.fillMaxSize(),
                         bottomBar = {
-                            if(currentDestination?.contains("FullUi") == false){
+                            if(currentDestination?.contains("FullUi") == false && currentDestination?.contains("DetailScreen") == false){
                                 BottomNavigationBar(navController = navController)
 
                             }
                         }) { innerPadding ->
-                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState, discoverViewModel = discoverViewModel, context = this.application)
+                        Navigation(navController, Modifier.padding(innerPadding),weahtherViewModel, settingViewModel = settingViewModel, snackbarHostState = snackbarHostState, discoverViewModel = discoverViewModel, alertViewModel = alertViewModel,context = this.application)
 
 
                 }
 
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
         }
     }
     override fun attachBaseContext(base: Context) {

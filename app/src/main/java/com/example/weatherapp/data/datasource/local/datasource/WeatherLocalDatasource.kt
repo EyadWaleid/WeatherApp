@@ -1,9 +1,8 @@
-package com.example.weatherapp.data.datasource.local
+package com.example.weatherapp.data.datasource.local.datasource
 
 import android.content.Context
 import com.example.weatherapp.data.db.AppDatabase
-import com.example.weatherapp.data.model.CountryForecast
-import kotlinx.coroutines.flow.Flow
+import com.example.weatherapp.data.model.entity.CountryForecast
 
 
 class WeatherLocalDatasource(context: Context) {

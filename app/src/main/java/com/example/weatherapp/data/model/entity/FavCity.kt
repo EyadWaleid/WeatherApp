@@ -1,8 +1,7 @@
-package com.example.weatherapp.data.model
+package com.example.weatherapp.data.model.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.serialization.Serializable
 
 @Entity(tableName = "fav_country")
 data class FavCity(

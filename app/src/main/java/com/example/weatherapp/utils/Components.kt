@@ -30,3 +30,21 @@ fun ThereIsNoData() {
         modifier = Modifier.size(200.dp)
     )
 }
+@Composable
+fun  ThereIsNoAlerts(){
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.noalerts)
+    )
+
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier.size(200.dp)
+    )
+}

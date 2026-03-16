@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.example.weatherapp.screens.details.view.shimmer.DiscoverLoading
 import com.example.weatherapp.screens.details.viewmodel.DetailViewModel
-import com.example.weatherapp.screens.home.view_model.WeatherViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

@@ -1,4 +1,5 @@
 package com.example.weatherapp.screens.settings.view
+
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -54,7 +55,12 @@ import com.example.weatherapp.utils.Units
 import kotlinx.coroutines.launch
 
 @Composable
-fun  SettingScreen(modifier: Modifier= Modifier,settingViewModel: SettingViewModel,snackbarHostState: SnackbarHostState,onMapClick:()-> Unit){
+fun SettingScreen(
+    modifier: Modifier = Modifier,
+    settingViewModel: SettingViewModel,
+    snackbarHostState: SnackbarHostState,
+    onMapClick: () -> Unit
+) {
     val userSettingsState by settingViewModel.settingsState.collectAsState()
     val snackbarEvent by settingViewModel.snackbarEvent.collectAsState()
     val scope = rememberCoroutineScope()
@@ -69,57 +75,81 @@ fun  SettingScreen(modifier: Modifier= Modifier,settingViewModel: SettingViewMod
             }
         }
     }
-   when(userSettingsState)
-    {
-       is SettingViewModel.SettingsState.Data -> {
-           Column (modifier = modifier.fillMaxSize().background(colorResource(R.color.darkBlue)).padding(8.dp),
-           ) {
-               AppBar()
-               Spacer(modifier = Modifier.size(32.dp))
-               Text(stringResource(R.string.location_source), color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
-               Spacer(modifier = Modifier.size(12.dp))
-               LocationTrackerBtnToggle(onClick = {
+    when (userSettingsState) {
+        is SettingViewModel.SettingsState.Data -> {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(colorResource(R.color.darkBlue))
+                    .padding(8.dp),
+            ) {
+                AppBar()
+                Spacer(modifier = Modifier.size(32.dp))
+                Text(
+                    stringResource(R.string.location_source),
+                    color = colorResource(R.color.blue),
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(modifier = Modifier.size(12.dp))
+                LocationTrackerBtnToggle(
+                    onClick = {
+                        onMapClick()
+                    },
+                    locationSource = (userSettingsState as SettingViewModel.SettingsState.Data).locationSource,
+                    settingViewModel = settingViewModel
+                )
+                Spacer(modifier = Modifier.size(32.dp))
+                Text(
+                    stringResource(R.string.temperature_units),
+                    color = colorResource(R.color.blue),
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(modifier = Modifier.size(12.dp))
+                TemperatureUnitsBtnToggle(
+                    tempUInt = (userSettingsState as SettingViewModel.SettingsState.Data).tempUnit,
+                    onClick = {
+                        when (it) {
+                            0 -> settingViewModel.setTempUnit(TempUnits.CELSIUS.displayName)
+                            1 -> settingViewModel.setTempUnit(TempUnits.FAHRENHEIT.displayName)
+                            2 -> settingViewModel.setTempUnit(TempUnits.KELVIN.displayName)
+                        }
+                    })
+                Spacer(modifier = Modifier.size(32.dp))
+                Text(
+                    stringResource(R.string.wind_speed_units),
+                    color = colorResource(R.color.blue),
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(modifier = Modifier.size(12.dp))
+                WindUnitsBtnToggle(
+                    windUnit = (userSettingsState as SettingViewModel.SettingsState.Data).windUnit,
+                    onClick = {
+                        when (it) {
+                            0 -> settingViewModel.setWindUnit(Units.METERS_PER_SECOND.displayName)
+                            1 -> settingViewModel.setWindUnit(Units.MILES_PER_HOUR.displayName)
+                        }
+                    })
+                Spacer(modifier = Modifier.size(32.dp))
+                LanguageDropdown(
+                    (userSettingsState as SettingViewModel.SettingsState.Data).language,
+                    onClick = {
+                        settingViewModel.setLanguage(it)
+                    })
+            }
+        }
 
+        is SettingViewModel.SettingsState.Error -> {
+            Text("There is no data wait please ")
+        }
 
-                      onMapClick()
-
-
-               }, locationSource = (userSettingsState as SettingViewModel.SettingsState.Data).locationSource, settingViewModel = settingViewModel)
-               Spacer(modifier = Modifier.size(32.dp))
-               Text(stringResource(R.string.temperature_units), color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
-               Spacer(modifier = Modifier.size(12.dp))
-               TemperatureUnitsBtnToggle(tempUInt = (userSettingsState as SettingViewModel.SettingsState.Data).tempUnit, onClick = {
-                   when(it){
-                       0->settingViewModel.setTempUnit(TempUnits.CELSIUS.displayName)
-                       1->settingViewModel.setTempUnit(TempUnits.FAHRENHEIT.displayName)
-                       2->settingViewModel.setTempUnit(TempUnits.KELVIN.displayName)
-                   }
-               })
-               Spacer(modifier = Modifier.size(32.dp))
-               Text(stringResource(R.string.wind_speed_units), color = colorResource(R.color.blue),style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
-               Spacer(modifier = Modifier.size(12.dp))
-               WindUnitsBtnToggle(windUnit = (userSettingsState as SettingViewModel.SettingsState.Data).windUnit, onClick = {
-                   when(it){
-                       0->settingViewModel.setWindUnit( Units.METERS_PER_SECOND.displayName)
-                       1->settingViewModel.setWindUnit(Units.MILES_PER_HOUR.displayName)
-                   }
-               })
-               Spacer(modifier = Modifier.size(32.dp))
-               LanguageDropdown((userSettingsState as SettingViewModel.SettingsState.Data).language, onClick = {
-                   settingViewModel.setLanguage(it)
-               })
-           }
-       }
-       is SettingViewModel.SettingsState.Error -> {
-           Text("There is no data wait please ")
-       }
-       is SettingViewModel.SettingsState.Loading -> {
-           Text("Setting data for u wait XD")
-       }
-   }
+        is SettingViewModel.SettingsState.Loading -> {
+            Text("Setting data for u wait XD")
+        }
+    }
 }
+
 @Composable
-fun AppBar(modifier: Modifier= Modifier){
+fun AppBar(modifier: Modifier = Modifier) {
     val lineColor = colorResource(R.color.blueWithOpcity)
     Box(
         modifier = Modifier
@@ -143,17 +173,25 @@ fun AppBar(modifier: Modifier= Modifier){
         )
     }
 }
+
 @Composable
-fun LocationTrackerBtnToggle(modifier: Modifier= Modifier,locationSource: String,onClick: () -> Unit,settingViewModel: SettingViewModel){
-    var selectedIndex = when(locationSource){
-         LocationSource.GPS.displayName-> 0
-        LocationSource.MAP.displayName->1
-        else -> {0}
+fun LocationTrackerBtnToggle(
+    modifier: Modifier = Modifier,
+    locationSource: String,
+    onClick: () -> Unit,
+    settingViewModel: SettingViewModel
+) {
+    var selectedIndex = when (locationSource) {
+        LocationSource.GPS.displayName -> 0
+        LocationSource.MAP.displayName -> 1
+        else -> {
+            0
+        }
     }
 
     val options = mutableListOf("GPS", "Map")
     val icons = listOf(
-       R.drawable.baseline_location_pin_24,
+        R.drawable.baseline_location_pin_24,
         R.drawable.outline_map_24
     )
     Box(
@@ -166,18 +204,19 @@ fun LocationTrackerBtnToggle(modifier: Modifier= Modifier,locationSource: String
                     colorResource(R.color.blueWithOpcity)
                 ),
                 shape = RoundedCornerShape(15.dp)
-            ).background(
-              color = colorResource(R.color.darkBlueWithOpacity),
+            )
+            .background(
+                color = colorResource(R.color.darkBlueWithOpacity),
                 shape = RoundedCornerShape(15)
             )
             .padding(4.dp),
 
-    ) {
+        ) {
         Row(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            options.forEachIndexed{ index, label ->
+            options.forEachIndexed { index, label ->
                 val isSelected = selectedIndex == index
                 Box(
                     modifier = Modifier
@@ -192,25 +231,28 @@ fun LocationTrackerBtnToggle(modifier: Modifier= Modifier,locationSource: String
                                 Color.Transparent
                         )
                         .clickable {
-                            if( settingViewModel.checkConnectivity()){
-                                if(selectedIndex==index&&index==0){
+                            if (settingViewModel.checkConnectivity()) {
+                                if (selectedIndex == index && index == 0) {
                                     return@clickable
-                                }
-                                else if(index==0){
-                                     settingViewModel.setLocationSourceToMap()
+                                } else if (index == 0) {
+                                    settingViewModel.setLocationSourceToMap()
                                     return@clickable
                                 }
                                 selectedIndex = index
                                 onClick()
                             }
 
-                                  },
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(painter = painterResource(icons[index]), contentDescription = "", tint = colorResource(if (isSelected) R.color.blue else R.color.greyBlue))
+                        Icon(
+                            painter = painterResource(icons[index]),
+                            contentDescription = "",
+                            tint = colorResource(if (isSelected) R.color.blue else R.color.greyBlue)
+                        )
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = label,
@@ -226,19 +268,23 @@ fun LocationTrackerBtnToggle(modifier: Modifier= Modifier,locationSource: String
         }
     }
 }
+
 @Composable
-fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onClick:(Int)-> Unit){
+fun TemperatureUnitsBtnToggle(
+    modifier: Modifier = Modifier,
+    tempUInt: String,
+    onClick: (Int) -> Unit
+) {
 
 
+    val selectedIndex = when (tempUInt) {
+        TempUnits.CELSIUS.displayName -> 0
+        TempUnits.FAHRENHEIT.displayName -> 1
+        TempUnits.KELVIN.displayName -> 2
+        else -> 0
+    }
 
-       val selectedIndex = when (tempUInt) {
-            TempUnits.CELSIUS.displayName -> 0
-            TempUnits.FAHRENHEIT.displayName -> 1
-            TempUnits.KELVIN.displayName -> 2
-            else -> 0
-        }
-
-    val options = listOf(R.string.celsius, R.string.fahrenheit,R.string.kelvin)
+    val options = listOf(R.string.celsius, R.string.fahrenheit, R.string.kelvin)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -249,12 +295,13 @@ fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onCl
                     colorResource(R.color.blueWithOpcity)
                 ),
                 shape = RoundedCornerShape(15.dp)
-            ).background(
+            )
+            .background(
                 color = colorResource(R.color.darkBlueWithOpacity),
                 shape = RoundedCornerShape(15)
             )
             .padding(4.dp),
-        ) {
+    ) {
         Row(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -271,11 +318,12 @@ fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onCl
                                 Color(0xFF3A4A5F)
                             else
                                 Color.Transparent
-                        ).clickable {
-                        if(selectedIndex!=index){
+                        )
+                        .clickable {
+                            if (selectedIndex != index) {
                                 onClick(index)
                             }
-                            },
+                        },
                     contentAlignment = Alignment.Center
                 ) {
 
@@ -297,8 +345,9 @@ fun TemperatureUnitsBtnToggle(modifier: Modifier= Modifier,tempUInt: String,onCl
         }
     }
 }
+
 @Composable
-fun WindUnitsBtnToggle(modifier: Modifier= Modifier,onClick: (Int) -> Unit , windUnit: String){
+fun WindUnitsBtnToggle(modifier: Modifier = Modifier, onClick: (Int) -> Unit, windUnit: String) {
     var selectedIndex by remember { mutableIntStateOf(0) }
     LaunchedEffect(windUnit) {
         selectedIndex = when (windUnit) {
@@ -319,7 +368,8 @@ fun WindUnitsBtnToggle(modifier: Modifier= Modifier,onClick: (Int) -> Unit , win
                     colorResource(R.color.blueWithOpcity)
                 ),
                 shape = RoundedCornerShape(15.dp)
-            ).background(
+            )
+            .background(
                 color = colorResource(R.color.darkBlueWithOpacity),
                 shape = RoundedCornerShape(15)
 
@@ -348,7 +398,8 @@ fun WindUnitsBtnToggle(modifier: Modifier= Modifier,onClick: (Int) -> Unit , win
                         )
 
                         .clickable {
-                            onClick(index)},
+                            onClick(index)
+                        },
                     contentAlignment = Alignment.Center
                 ) {
 
@@ -370,19 +421,19 @@ fun WindUnitsBtnToggle(modifier: Modifier= Modifier,onClick: (Int) -> Unit , win
         }
     }
 }
-@Composable
-fun LanguageDropdown(languageCode:String,onClick: (String) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedLanguage by remember { mutableStateOf(languageCode) }
-    LaunchedEffect(languageCode) {
-        selectedLanguage = languageCode
-    }
 
-    val languages = listOf(Language.ENGLISH, Language.ARABIC,)
+@Composable
+fun LanguageDropdown(languageCode: String, onClick: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedLanguage = languageCode
+    val languages = listOf(Language.ENGLISH, Language.ARABIC)
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colorResource(R.color.darkBlueWithOpacity), shape = RoundedCornerShape(10.dp))
+            .background(
+                colorResource(R.color.darkBlueWithOpacity),
+                shape = RoundedCornerShape(10.dp)
+            )
             .clickable { expanded = !expanded }
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
@@ -400,14 +451,24 @@ fun LanguageDropdown(languageCode:String,onClick: (String) -> Unit) {
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
-                    Text(stringResource(R.string.display_language), fontSize = 12.sp, color = Color.Gray)
+                    Text(
+                        stringResource(R.string.display_language),
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
                     Spacer(modifier = Modifier.size(5.dp))
-                    Text(if(selectedLanguage == "en")stringResource(Language.ENGLISH.resId)else stringResource(Language.ARABIC.resId), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(
+                        if (selectedLanguage == "en") stringResource(Language.ENGLISH.resId) else stringResource(
+                            Language.ARABIC.resId
+                        ), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White
+                    )
 
                 }
             }
             Icon(
-                painter = if (expanded) painterResource(R.drawable.outline_arrow_upward_alt_24) else painterResource(R.drawable.outline_arrow_downward_alt_24),
+                painter = if (expanded) painterResource(R.drawable.outline_arrow_upward_alt_24) else painterResource(
+                    R.drawable.outline_arrow_downward_alt_24
+                ),
                 contentDescription = null,
                 tint = Color.Gray
             )
@@ -422,17 +483,17 @@ fun LanguageDropdown(languageCode:String,onClick: (String) -> Unit) {
             languages.forEach { language ->
                 DropdownMenuItem(
                     onClick = {
-                        if(selectedLanguage != language.code){
-                            selectedLanguage=language.code
-                      onClick(selectedLanguage)
+                        if (selectedLanguage != language.code) {
+                            selectedLanguage = language.code
+                            onClick(selectedLanguage)
                         }
                         expanded = false
                     },
                     text = {
                         Text(text = stringResource(language.resId), color = Color.White)
-                           },
+                    },
 
-                )
+                    )
             }
         }
     }

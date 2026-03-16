@@ -11,6 +11,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -27,19 +31,34 @@ import androidx.compose.ui.platform.LocalContext
 
 import com.example.weatherapp.screens.home.view.components.shimmer.ShowLoading
 import com.example.weatherapp.screens.home.view.components.views.ShowWeather
-import com.example.weatherapp.screens.home.view_model.WeatherViewModel
+import com.example.weatherapp.screens.home.view_model.HomeViewModel
+import kotlinx.coroutines.launch
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, weatherViewModel: WeatherViewModel){
+fun HomeScreen(modifier: Modifier = Modifier, homeViewModel: HomeViewModel,snackbarHostState:SnackbarHostState){
     val  context=LocalContext.current
-    val weatherState by weatherViewModel.weatherState.collectAsState()
+    val weatherState by homeViewModel.weatherState.collectAsState()
     var isRefresh by remember { mutableStateOf(false) }
+    val snackbarEvent by homeViewModel.snackbarEvent.collectAsState()
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(snackbarEvent) {
+        snackbarEvent?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = it,
+                    duration = SnackbarDuration.Short,
+                )
+                homeViewModel.clearEvent()
+            }
+        }
+    }
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val granted = permissions.values.any { it }
         if (granted){
-            weatherViewModel.refreshLocation()
+            homeViewModel.refreshLocation()
         }
     }
     Box(modifier = modifier.fillMaxSize()) {
@@ -60,8 +79,7 @@ fun HomeScreen(modifier: Modifier = Modifier, weatherViewModel: WeatherViewModel
                 )
         )
         when(weatherState){
-            is WeatherViewModel.WeatherState.PermissionDisabled-> {
-                Log.d("Weather", "permission disabled")
+            is HomeViewModel.WeatherState.PermissionDisabled-> {
                 LaunchedEffect(Unit) {
                     permissionLauncher.launch(
                         arrayOf(
@@ -71,32 +89,30 @@ fun HomeScreen(modifier: Modifier = Modifier, weatherViewModel: WeatherViewModel
                     )
                 }
             }
-            is WeatherViewModel.WeatherState.LocationDisabled ->{
-                Log.d("Weather", "Location disabled")
+            is HomeViewModel.WeatherState.LocationDisabled ->{
 
                 val  intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 context.startActivity(intent)
             }
-            is WeatherViewModel.WeatherState.WeatherData ->{
+            is HomeViewModel.WeatherState.WeatherData ->{
                 PullToRefreshBox(
                     isRefreshing =isRefresh,
                     onRefresh = {
                         isRefresh=true
-                        weatherViewModel.refreshLocation()
+                        homeViewModel.refreshLocation()
                         isRefresh=false
 
                     },
                 ) {
-                    ShowWeather(modifier, weatherState as WeatherViewModel.WeatherState.WeatherData)
+                    ShowWeather(modifier, weatherState as HomeViewModel.WeatherState.WeatherData)
                 }
             }
 
-            WeatherViewModel.WeatherState.IsLoading -> {
-                Log.d("Weather",  "Loading")
+            HomeViewModel.WeatherState.IsLoading -> {
                     ShowLoading()
             }
-            is WeatherViewModel.WeatherState.OnError -> {
-                val errorState = weatherState as WeatherViewModel.WeatherState.OnError
+            is HomeViewModel.WeatherState.OnError -> {
+                val errorState = weatherState as HomeViewModel.WeatherState.OnError
                 Log.d("Weather", errorState.errorMessage)
             }
 

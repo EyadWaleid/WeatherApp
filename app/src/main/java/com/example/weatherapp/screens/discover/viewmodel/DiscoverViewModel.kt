@@ -4,11 +4,12 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.weatherapp.data.model.FavCity
+import com.example.weatherapp.data.model.entity.FavCity
 import com.example.weatherapp.data.repo.SettingsRepo
 import com.example.weatherapp.data.repo.WeatherHomeRepo
 import com.example.weatherapp.utils.UserSettings
 import com.example.weatherapp.utils.WeatherMapper.getUnits
+import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -16,13 +17,15 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.maplibre.spatialk.geojson.Position
 
-class DiscoverViewModel(val context: Application) : ViewModel() {
+class DiscoverViewModel(private  val context: Application) : ViewModel() {
     sealed class FavState {
         object Loading : FavState()
         object Empty : FavState()
         data class Data(val cities: List<FavCity>, val units: String) : FavState()
         data class Error(val message: String) : FavState()
     }
+    private val _snackbarEvent = MutableStateFlow<String?>(null)
+    val snackbarEvent: StateFlow<String?> = _snackbarEvent
 
     private val _favState = MutableStateFlow<FavState>(FavState.Loading)
     val favState: StateFlow<FavState> = _favState
@@ -81,6 +84,16 @@ init {
         viewModelScope.launch {
             repo.delete(favCity)
         }
+    }
+    fun checkConnectivity(): Boolean{
+        if(!NetworkMonitor(context=context).isInternetAvailable()){
+            _snackbarEvent.value="Check connectivity"
+            return false
+        }
+        return  true
+    }
+    fun clearEvent() {
+        _snackbarEvent.value = null
     }
 
 }

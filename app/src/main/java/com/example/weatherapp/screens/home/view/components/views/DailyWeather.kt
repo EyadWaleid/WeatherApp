@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
-import com.example.weatherapp.data.model.DailyWeather
+import com.example.weatherapp.data.model.entity.DailyWeather
 
 @Composable
 fun DaysForecst(modifier: Modifier = Modifier, dailyWeather: List<DailyWeather>,tempUnits: String) {
@@ -102,18 +102,6 @@ fun DayForecastItem(
             Text("${dailyWeather.maxTemp.toInt()}$tempUnit", style = MaterialTheme.typography.bodyMedium, color = colorResource(R.color.white))
             Spacer(Modifier.size(8.dp))
             Text("${dailyWeather.minTemp.toInt()}$tempUnit", style = MaterialTheme.typography.bodyMedium, color = colorResource(R.color.greyBlue))
-            Spacer(Modifier.size(4.dp))
-
-            IconButton(
-                onClick = { },
-                modifier = Modifier.size(24.dp)
-            ) {
-                Icon(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(R.drawable.outline_arrow_forward_ios_24),
-                    contentDescription = "",
-                    tint = colorResource(R.color.blue)
-                )
-            }        }
+            Spacer(Modifier.size(4.dp)) }
     }
 }

@@ -7,8 +7,8 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.weatherapp.data.model.DailyWeather
-import com.example.weatherapp.data.model.HourlyWeather
+import com.example.weatherapp.data.model.entity.DailyWeather
+import com.example.weatherapp.data.model.entity.HourlyWeather
 import com.example.weatherapp.data.repo.SettingsRepo
 import com.example.weatherapp.data.repo.WeatherHomeRepo
 import com.example.weatherapp.utils.LocationHelper
@@ -17,6 +17,7 @@ import com.example.weatherapp.utils.Units
 import com.example.weatherapp.utils.UserSettings
 import com.example.weatherapp.utils.WeatherMapper.convertWind
 import com.example.weatherapp.utils.WeatherMapper.getUnits
+import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -24,9 +25,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
-class WeatherViewModel(context: Application) : ViewModel() {
+class HomeViewModel(private  val context: Application) : ViewModel() {
+    private val _snackbarEvent = MutableStateFlow<String?>(null)
+    val snackbarEvent: StateFlow<String?> = _snackbarEvent
     private val repo = WeatherHomeRepo(context = context)
     private val userSettingsRepo = SettingsRepo(context = context)
+    fun clearEvent() {
+        _snackbarEvent.value = null
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private val locationProvider = LocationHelper(context)
@@ -39,6 +45,7 @@ class WeatherViewModel(context: Application) : ViewModel() {
     init {
         observeSettings()
     }
+
     private fun observeSettings() {
         viewModelScope.launch {
             combine(
@@ -65,22 +72,26 @@ class WeatherViewModel(context: Application) : ViewModel() {
                         updateWindLocally(newSettings.windUnit, newSettings.lang)
                     }
 
-                    else -> when (currentSettings.locationSource) {
-                        LocationSource.GPS.displayName -> fetchLocation()
-                        LocationSource.MAP.displayName -> {
-                            if (!(currentSettings.mapLat == 0.0 && currentSettings.mapLon == 0.0)) {
-                                loadWeatherData(
-                                    long = currentSettings.mapLon,
-                                    lat = currentSettings.mapLat
-                                )
-                            }
-                        }
-                    }
+                    else ->fetchLocatoinByLocationSoruce()
 
                 }
             }
         }
     }
+    private  fun fetchLocatoinByLocationSoruce(){
+        when (currentSettings.locationSource) {
+            LocationSource.GPS.displayName -> fetchLocation()
+            LocationSource.MAP.displayName -> {
+                if (!(currentSettings.mapLat == 0.0 && currentSettings.mapLon == 0.0)) {
+                    loadWeatherData(
+                        long = currentSettings.mapLon,
+                        lat = currentSettings.mapLat
+                    )
+                }
+            }
+        }
+    }
+
     private fun updateWindLocally(wind: String, lang: String) {
         val state = _weatherState.value as WeatherState.WeatherData
         _weatherState.value = state.copy(
@@ -91,22 +102,26 @@ class WeatherViewModel(context: Application) : ViewModel() {
             }
         )
     }
+
     fun refreshLocation() {
-        fetchLocation()
+        if(!NetworkMonitor(context = context).isInternetAvailable()){
+            _snackbarEvent.value="Please check your connectivity"
+        return
+        }
+
+       fetchLocatoinByLocationSoruce()
     }
 
 
-
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun fetchLocation()
-    {
-        Log.d("LOC","I've entered in Init")
+    private fun fetchLocation() {
 
         viewModelScope.launch {
             if (!locationProvider.checkPermissions()) {
                 _weatherState.value = WeatherState.PermissionDisabled
 
-            } else if (!locationProvider.isLocationEnabled()) {
+            }
+            else if (!locationProvider.isLocationEnabled()) {
                 _weatherState.value = WeatherState.LocationDisabled
 
             } else {
@@ -120,6 +135,7 @@ class WeatherViewModel(context: Application) : ViewModel() {
                         _weatherState.value = WeatherState.OnError("Unable to get location")
                     }
                 } catch (e: Exception) {
+                    Log.d("LOC","errrorrr")
                     _weatherState.value = WeatherState.OnError(e.message ?: "Unknown error")
                 }
 
@@ -186,6 +202,6 @@ class WeatherViewModel(context: Application) : ViewModel() {
 class WeatherFactory(val context: Application) : ViewModelProvider.Factory {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return WeatherViewModel(context) as T
+        return HomeViewModel(context) as T
     }
 }

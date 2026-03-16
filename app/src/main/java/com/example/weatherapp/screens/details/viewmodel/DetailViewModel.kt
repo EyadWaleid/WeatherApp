@@ -4,9 +4,8 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.weatherapp.data.model.DailyWeather
-import com.example.weatherapp.data.model.FavCity
-import com.example.weatherapp.data.model.HourlyWeather
+import com.example.weatherapp.data.model.entity.DailyWeather
+import com.example.weatherapp.data.model.entity.HourlyWeather
 import com.example.weatherapp.data.repo.SettingsRepo
 import com.example.weatherapp.data.repo.WeatherHomeRepo
 import com.example.weatherapp.utils.Units

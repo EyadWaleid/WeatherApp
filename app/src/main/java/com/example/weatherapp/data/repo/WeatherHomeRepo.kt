@@ -4,11 +4,11 @@ import android.app.Application
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.example.weatherapp.data.datasource.local.FavLocalDataSource
-import com.example.weatherapp.data.datasource.local.WeatherLocalDatasource
+import com.example.weatherapp.data.datasource.local.datasource.FavLocalDataSource
+import com.example.weatherapp.data.datasource.local.datasource.WeatherLocalDatasource
 import com.example.weatherapp.data.datasource.remote.WeatherDataSource
-import com.example.weatherapp.data.model.CountryForecast
-import com.example.weatherapp.data.model.FavCity
+import com.example.weatherapp.data.model.entity.CountryForecast
+import com.example.weatherapp.data.model.entity.FavCity
 
 import com.example.weatherapp.utils.WeatherMapper.mapToDailyWeather
 import kotlinx.coroutines.async
@@ -32,11 +32,12 @@ class WeatherHomeRepo(
         units: String = "metric",
         lang: String = "en"
     ): Result<CountryForecast> {
+
         return try {
-            Log.d("LOC", "I entered the load function")
+
 
             val result = weatherDataSource.getWeatherCountryInfo(lat = lat, lon = lon, units, lang)
-            if (result.isSuccess) {
+
                 val forecastData = result.getOrThrow()
                 Log.d(
                     "LOC",
@@ -44,23 +45,32 @@ class WeatherHomeRepo(
                 )
                 val countryWeather = CountryForecast(
                     city = forecastData.city.name,
+                    long = forecastData.city.coord.lon,
+                    lat = forecastData.city.coord.lat,
                     countryCode = forecastData.city.country,
                     weatherOfDays = mapToDailyWeather(forecastData, lang = lang)
                 )
+
+
                 localDatasource.insertForecast(countryWeather)
                 Result.success(countryWeather)
-            } else {
-                Result.failure(result.exceptionOrNull() ?: Exception("Unknown error"))
-            }
+
         } catch (e: Exception) {
             Log.d("LOC", "error${e.message}")
-
+            Log.d("LOC", "error: ${e.message}")
             val cached = localDatasource.getForecast()
+            Log.d("LOC", "cached: $cached")
             if (cached != null) {
                 Result.success(cached)
             } else {
                 Result.failure(Exception("No internet and no cached data"))
             }
+        }
+    }
+    suspend  fun getSavedWeatherForecast(): Result<CountryForecast>  {
+        return  runCatching {
+            localDatasource.getForecast()
+                ?: throw Exception("No forecast saved in database")
         }
     }
 
@@ -82,6 +92,8 @@ class WeatherHomeRepo(
         CountryForecast(
             city = forecastData.city.name,
             countryCode = forecastData.city.country,
+            long = forecastData.city.coord.lon,
+            lat=forecastData.city.coord.lat,
             weatherOfDays = mapToDailyWeather(forecastData, lang = lang)
         )
     }
@@ -135,6 +147,8 @@ class WeatherHomeRepo(
         }
         return true
     }
+
+
 
 
 }
