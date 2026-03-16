@@ -12,11 +12,11 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-class LocationHelper (val context: Context){
+class LocationHelper (val context: Context): ILocationHelper{
     private val fusedClient =
         LocationServices.getFusedLocationProviderClient(context)
 
-   fun checkPermissions(): Boolean{
+   override fun checkPermissions(): Boolean{
        val permission = ContextCompat.checkSelfPermission(
            context,
            Manifest.permission.ACCESS_FINE_LOCATION
@@ -25,14 +25,14 @@ class LocationHelper (val context: Context){
        ) == PackageManager.PERMISSION_GRANTED
         return  permission
     }
-    fun isLocationEnabled(): Boolean{
+    override fun isLocationEnabled(): Boolean{
         val location: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         return  location.isProviderEnabled(LocationManager.GPS_PROVIDER)|| location.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER)
     }
     @SuppressLint("MissingPermission")
-    suspend fun getUserLocation(): Location? =
+    override suspend fun getUserLocation(): Location? =
         suspendCancellableCoroutine { cont ->
             fusedClient.lastLocation
                 .addOnSuccessListener { lastLocation ->

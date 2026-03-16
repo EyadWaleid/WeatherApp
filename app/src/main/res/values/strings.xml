@@ -35,4 +35,5 @@
     <string name="alert_type">Alert Type</string>
     <string name="alert_naming">Alert name</string>
     <string name="no_alerts">Add your first alert</string>
+    <string name="checkConectivity">Check your connectivity</string>
 </resources>

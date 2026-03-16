@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
 import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModel
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModelFactory
@@ -51,6 +52,7 @@ import com.example.weatherapp.utils.constants.Constants
 import com.example.weatherapp.utils.routes.Route
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import com.example.weatherapp.utils.localization.AppLocalization
+import com.example.weatherapp.utils.location.LocationHelper
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -63,12 +65,21 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val settingsRepo = SettingsRepo(application)
+            val homeRepo = WeatherHomeRepo(context = application)
             val networkMonitor = NetworkMonitor(application)
+            val locationHelper = LocationHelper(application)
             val localizationManager = AppLocalization(this)
             val discoverViewModel: DiscoverViewModel =
                 viewModel(factory = DiscoverFactoryModel(this.application))
             val weahtherViewModel: HomeViewModel =
-                viewModel(factory = WeatherFactory(context = this.application))
+                viewModel(
+                    factory = WeatherFactory(
+                        networkMonitor = networkMonitor,
+                        repo = homeRepo,
+                        userSettingsRepo = settingsRepo,
+                        locationProvider = locationHelper,
+                    )
+                )
             val settingViewModel: SettingViewModel = viewModel(
                 factory = SettingViewModelFactory(
                     settingsRepo = settingsRepo,

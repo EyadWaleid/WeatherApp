@@ -61,11 +61,6 @@ class AlertViewModel(private  val  context: Application) : ViewModel() {
 
     }
 
-    fun closeAlarm(id: Long) {
-        viewModelScope.launch {
-            repo.turnOffAlarm(id)
-        }
-    }
 
     fun clearEvent() {
         _snackbarEvent.value = null

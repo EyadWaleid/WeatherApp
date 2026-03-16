@@ -48,3 +48,41 @@ fun  ThereIsNoAlerts(){
         modifier = Modifier.size(200.dp)
     )
 }
+@Composable
+fun Offline(){
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.offline_dgaccel)
+    )
+
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier.size(200.dp)
+    )
+
+}
+@Composable
+fun Error(){
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.error)
+    )
+
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier.size(200.dp)
+    )
+
+}

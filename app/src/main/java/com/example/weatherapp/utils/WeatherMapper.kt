@@ -129,7 +129,6 @@ object WeatherMapper {
         }
     }
       fun getUnits(unit: String):String{
-        Log.d("Units","My unit now is : $unit")
         if(unit == TempUnits.FAHRENHEIT.displayName){
             return  "imperial"
         }
