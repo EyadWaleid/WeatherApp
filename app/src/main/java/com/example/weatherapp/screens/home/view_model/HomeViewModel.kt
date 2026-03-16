@@ -11,10 +11,10 @@ import com.example.weatherapp.data.model.entity.DailyWeather
 import com.example.weatherapp.data.model.entity.HourlyWeather
 import com.example.weatherapp.data.repo.SettingsRepo
 import com.example.weatherapp.data.repo.WeatherHomeRepo
-import com.example.weatherapp.utils.LocationHelper
-import com.example.weatherapp.utils.LocationSource
-import com.example.weatherapp.utils.Units
-import com.example.weatherapp.utils.UserSettings
+import com.example.weatherapp.utils.location.LocationHelper
+import com.example.weatherapp.utils.constants.LocationSource
+import com.example.weatherapp.utils.constants.Units
+import com.example.weatherapp.utils.constants.UserSettings
 import com.example.weatherapp.utils.WeatherMapper.convertWind
 import com.example.weatherapp.utils.WeatherMapper.getUnits
 import com.example.weatherapp.utils.connectivity.NetworkMonitor

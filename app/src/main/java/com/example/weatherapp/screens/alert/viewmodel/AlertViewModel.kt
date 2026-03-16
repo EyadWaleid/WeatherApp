@@ -8,11 +8,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.model.entity.UserAlerts
 import com.example.weatherapp.data.repo.AlertRepo
+import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class AlertViewModel(context: Application) : ViewModel() {
+class AlertViewModel(private  val  context: Application) : ViewModel() {
 
     sealed class AlertState {
         object Loading : AlertState()
@@ -24,6 +25,8 @@ class AlertViewModel(context: Application) : ViewModel() {
     private val repo = AlertRepo(context)
     private val _alertState = MutableStateFlow<AlertState>(AlertState.Loading)
     val alertState: StateFlow<AlertState> = _alertState
+    private val _snackbarEvent = MutableStateFlow<String?>(null)
+    val snackbarEvent: StateFlow<String?> = _snackbarEvent
 
     init {
         viewModelScope.launch {
@@ -36,15 +39,26 @@ class AlertViewModel(context: Application) : ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun insertAlarm(userAlerts: UserAlerts) {
+        if(!NetworkMonitor(context).isInternetAvailable()){
+            _snackbarEvent.value="check your connectivity"
+            return
+        }
         viewModelScope.launch {
             repo.insertAlarm(userAlerts)
         }
+
+
     }
 
     fun deleteAlarm(userAlerts: UserAlerts) {
+        if(!NetworkMonitor(context).isInternetAvailable()){
+            _snackbarEvent.value="check your connectivity"
+            return
+        }
         viewModelScope.launch {
             repo.deleteAlarm(userAlerts)
         }
+
     }
 
     fun closeAlarm(id: Long) {
@@ -53,7 +67,9 @@ class AlertViewModel(context: Application) : ViewModel() {
         }
     }
 
-
+    fun clearEvent() {
+        _snackbarEvent.value = null
+    }
 }
 
 class AlertViewModelFactory(val context: Application) : ViewModelProvider.Factory {

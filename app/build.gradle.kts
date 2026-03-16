@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.core.splashscreen)
     implementation(libs.work.runtime.ktx)
     implementation(libs.maplibre.compose)
     implementation(libs.compose.material.dialogs)

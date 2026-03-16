@@ -41,7 +41,7 @@ import com.example.weatherapp.R
 import com.example.weatherapp.data.model.entity.FavCity
 import com.example.weatherapp.screens.discover.view.shimmer.LoadingDiscover
 import com.example.weatherapp.screens.discover.viewmodel.DiscoverViewModel
-import com.example.weatherapp.utils.ThereIsNoData
+import com.example.weatherapp.utils.constants.ThereIsNoData
 import kotlinx.coroutines.launch
 
 @Composable

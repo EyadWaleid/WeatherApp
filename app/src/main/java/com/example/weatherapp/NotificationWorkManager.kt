@@ -14,10 +14,11 @@ import androidx.work.WorkerParameters
 import com.example.weatherapp.data.model.entity.CountryForecast
 import com.example.weatherapp.data.repo.SettingsRepo
 import com.example.weatherapp.data.repo.WeatherHomeRepo
-import com.example.weatherapp.utils.LocationHelper
-import com.example.weatherapp.utils.LocationSource
+import com.example.weatherapp.utils.location.LocationHelper
+import com.example.weatherapp.utils.constants.LocationSource
 import com.example.weatherapp.utils.WeatherMapper.getUnits
 import kotlinx.coroutines.flow.first
+import java.time.LocalTime
 import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -68,22 +69,21 @@ class NotificationWorkManager(
             Result.retry()
         }
     }
+    // check if  it will exceed time
     private fun isExceededToTime(to: String?): Boolean {
         if (to == null) return false
-        val now = Calendar.getInstance()
-        val toTime = Calendar.getInstance().apply {
-            val parts = to.split(":")
-            set(Calendar.HOUR_OF_DAY, parts[0].toInt())
-            set(Calendar.MINUTE, parts[1].toInt())
-            set(Calendar.SECOND, 0)
-        }
 
-        if (now.after(toTime)) return true
+        val now = LocalTime.now()
+        val toTime = LocalTime.parse(to)
 
-        val remainingMs = toTime.timeInMillis - now.timeInMillis
-        val fifteenMinutesMs = 15 * 60 * 1000L
-        val cycles = remainingMs / fifteenMinutesMs
+        if (now.isAfter(toTime)) return true
 
+        val nowSeconds = now.toSecondOfDay()
+        val toSeconds = toTime.toSecondOfDay()
+        val remainingSeconds = toSeconds - nowSeconds
+        val fifteenMinutesSeconds = 15 * 60
+
+        val cycles = remainingSeconds / fifteenMinutesSeconds
         return cycles <= 1
     }
    // show notification

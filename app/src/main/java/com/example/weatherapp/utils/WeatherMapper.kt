@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import com.example.weatherapp.data.model.entity.DailyWeather
 import com.example.weatherapp.data.model.entity.HourlyWeather
 import com.example.weatherapp.data.model.dto.ForecastData
+import com.example.weatherapp.utils.constants.TempUnits
 import java.time.LocalDate.*
 import java.time.format.TextStyle
 import java.util.Locale

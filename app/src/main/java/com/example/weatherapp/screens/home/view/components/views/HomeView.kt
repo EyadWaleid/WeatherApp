@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.weatherapp.R
 import com.example.weatherapp.screens.home.view_model.HomeViewModel
-import com.example.weatherapp.utils.WeatherIconLarge
+import com.example.weatherapp.utils.constants.WeatherIconLarge
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable

@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -46,8 +47,8 @@ import com.example.weatherapp.screens.settings.viewmodel.SettingViewModelFactory
 import com.example.weatherapp.screens.home.view_model.WeatherFactory
 import com.example.weatherapp.screens.home.view_model.HomeViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
-import com.example.weatherapp.utils.Constants
-import com.example.weatherapp.utils.Route
+import com.example.weatherapp.utils.constants.Constants
+import com.example.weatherapp.utils.routes.Route
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -56,6 +57,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         enableEdgeToEdge()
 
         setContent {
@@ -112,12 +114,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
-        }
-    }
     override fun attachBaseContext(base: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             super.attachBaseContext(base)

@@ -51,8 +51,9 @@ fun TimeRangeRow(
         }
     ) {
         timepicker(
-            initialTime = fromTime,
-            title = "Select From Time",
+            initialTime =LocalTime.now(),
+
+            timeRange = LocalTime.now()..LocalTime.of(23, 59)          ,
             is24HourClock = false,
             colors = TimePickerDefaults.colors(
                 activeBackgroundColor = colorResource(R.color.blue),

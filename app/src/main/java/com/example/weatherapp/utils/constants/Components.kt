@@ -1,4 +1,4 @@
-package com.example.weatherapp.utils
+package com.example.weatherapp.utils.constants
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
