@@ -27,4 +27,12 @@
     <string name="now">Now</string>
     <string name="forecast_days">5-Day Forecast</string>
     <string name="noData">Start discovering new cities</string>
+    <string name="config_new_alert">Configure new alert</string>
+    <string name="alert_name">e.g. Blizzard Alert</string>
+    <string name="active_time">Active Time Range</string>
+    <string name="from">From:</string>
+    <string name="to">To:</string>
+    <string name="alert_type">Alert Type</string>
+    <string name="alert_naming">Alert name</string>
+    <string name="no_alerts">Add your first alert</string>
 </resources>

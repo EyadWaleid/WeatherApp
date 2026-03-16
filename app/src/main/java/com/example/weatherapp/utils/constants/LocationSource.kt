@@ -1,4 +1,4 @@
-package com.example.weatherapp.utils
+package com.example.weatherapp.utils.constants
 
 enum class LocationSource (val displayName: String){
     GPS("gps"),

@@ -19,10 +19,14 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -34,14 +38,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
-import com.example.weatherapp.data.model.FavCity
+import com.example.weatherapp.data.model.entity.FavCity
 import com.example.weatherapp.screens.discover.view.shimmer.LoadingDiscover
 import com.example.weatherapp.screens.discover.viewmodel.DiscoverViewModel
-import com.example.weatherapp.utils.ThereIsNoData
+import com.example.weatherapp.utils.constants.ThereIsNoData
+import kotlinx.coroutines.launch
 
 @Composable
-fun DiscoverScreen(modifier: Modifier = Modifier, discoverViewModel: DiscoverViewModel,onClickItem: (FavCity) -> Unit) {
+fun DiscoverScreen(modifier: Modifier = Modifier, discoverViewModel: DiscoverViewModel,onClickItem: (FavCity) -> Unit,snackbarHostState: SnackbarHostState) {
     val discoverState by discoverViewModel.favState.collectAsState()
+     val snackbarEvent by discoverViewModel.snackbarEvent.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(snackbarEvent) {
+        snackbarEvent?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = it,
+                    duration = SnackbarDuration.Short,
+                )
+                discoverViewModel.clearEvent()
+            }
+        }
+    }
 
     Column(
         modifier = modifier
@@ -103,9 +122,15 @@ fun DiscoverScreen(modifier: Modifier = Modifier, discoverViewModel: DiscoverVie
                     }
                     items(data.size) {
                         CountryItem(city = data[it], onClick = { favCity ->
+                            if (discoverViewModel.checkConnectivity()){
+                                return@CountryItem
+                            }
                             discoverViewModel.deleteFavCity(favCity = favCity)
                         }, unit = (discoverState as DiscoverViewModel.FavState.Data).units, onClickItem = {
-                            onClickItem(it)
+                           if(discoverViewModel.checkConnectivity()){
+                               onClickItem(it)
+                           }
+
                         })
 
 

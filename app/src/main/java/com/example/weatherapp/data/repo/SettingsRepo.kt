@@ -1,7 +1,7 @@
 package com.example.weatherapp.data.repo
 
 import android.app.Application
-import com.example.weatherapp.data.datasource.local.UserPreferences
+import com.example.weatherapp.data.datasource.local.datasource.UserPreferences
 import kotlinx.coroutines.flow.Flow
 
 class SettingsRepo(val context: Application) {

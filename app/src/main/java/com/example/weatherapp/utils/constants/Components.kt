@@ -1,4 +1,4 @@
-package com.example.weatherapp.utils
+package com.example.weatherapp.utils.constants
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -16,6 +16,24 @@ import com.example.weatherapp.R
 fun ThereIsNoData() {
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.nodata)
+    )
+
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier.size(200.dp)
+    )
+}
+@Composable
+fun  ThereIsNoAlerts(){
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.noalerts)
     )
 
 

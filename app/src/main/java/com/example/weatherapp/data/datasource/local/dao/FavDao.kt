@@ -1,12 +1,11 @@
-package com.example.weatherapp.data.datasource.local
+package com.example.weatherapp.data.datasource.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.weatherapp.data.model.CountryForecast
-import com.example.weatherapp.data.model.FavCity
+import com.example.weatherapp.data.model.entity.FavCity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

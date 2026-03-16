@@ -52,7 +52,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.core.splashscreen)
+    implementation(libs.work.runtime.ktx)
     implementation(libs.maplibre.compose)
+    implementation(libs.compose.material.dialogs)
     implementation(libs.lottie.compose)
     implementation(libs.locationServices)
     implementation(libs.data.store.preferences)

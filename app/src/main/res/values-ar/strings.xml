@@ -28,4 +28,12 @@
     <string name="now">الأن</string>
     <string name="forecast_days">توقعات الطقس لخمسة  أيام</string>
     <string name="noData">أكتشف مدن جديدة</string>
+    <string name="config_new_alert">ضبط تنبيه جديد</string>
+    <string name="alert_name">مثلاً: تنبيه عاصفة ثلجية</string>
+    <string name="active_time">مدة النشاط</string>
+    <string name="from">من:</string>
+    <string name="to">الي:</string>
+    <string name="alert_type">نوع التنبيه</string>
+    <string name="alert_naming">اسم التحذير</string>
+    <string name="no_alerts">أضف أول تنبيه لك</string>
 </resources>

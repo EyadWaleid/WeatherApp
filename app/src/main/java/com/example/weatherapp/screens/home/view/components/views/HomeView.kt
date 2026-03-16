@@ -28,13 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.weatherapp.R
-import com.example.weatherapp.screens.home.view_model.WeatherViewModel
-import com.example.weatherapp.utils.WeatherIcon
-import com.example.weatherapp.utils.WeatherIconLarge
+import com.example.weatherapp.screens.home.view_model.HomeViewModel
+import com.example.weatherapp.utils.constants.WeatherIconLarge
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ShowWeather(modifier: Modifier = Modifier, weatherData: WeatherViewModel.WeatherState.WeatherData) {
+fun ShowWeather(modifier: Modifier = Modifier, weatherData: HomeViewModel.WeatherState.WeatherData) {
     val weatherCountry = weatherData.weather
     val hourlyWeather = weatherData.hourlyWeather
     val dailyWeather = weatherData.dailyWeatherData

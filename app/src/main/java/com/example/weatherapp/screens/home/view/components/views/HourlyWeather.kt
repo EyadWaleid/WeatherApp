@@ -1,7 +1,5 @@
 package com.example.weatherapp.screens.home.view.components.views
 
-import android.util.Log
-import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,8 +22,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
-import com.example.weatherapp.data.model.HourlyWeather
-import com.example.weatherapp.utils.WeatherIcon
+import com.example.weatherapp.data.model.entity.HourlyWeather
+import com.example.weatherapp.utils.constants.WeatherIcon
 
 @Composable
 fun HourlyWeather(modifier: Modifier= Modifier,hourlyWeather: List<HourlyWeather> ,tempUnits: String){

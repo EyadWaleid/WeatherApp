@@ -1,4 +1,4 @@
-package com.example.weatherapp.data.model
+package com.example.weatherapp.data.model.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -8,6 +8,8 @@ data class CountryForecast(
     val id: Long = 0,
     val city: String,
     val countryCode: String,
+    val long: Double,
+    val lat: Double,
     val weatherOfDays: List<DailyWeather>
 )
 

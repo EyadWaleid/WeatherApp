@@ -1,6 +1,5 @@
-package com.example.weatherapp.utils
+package com.example.weatherapp.utils.routes
 
-import com.example.weatherapp.data.model.FavCity
 import kotlinx.serialization.Serializable
 
 sealed class   Route {
