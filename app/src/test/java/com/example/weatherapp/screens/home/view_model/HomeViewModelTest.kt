@@ -1,6 +1,4 @@
 package com.example.weatherapp.screens.home.view_model
-
-import android.location.Location
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.weatherapp.data.model.entity.CountryForecast
 import com.example.weatherapp.data.model.entity.DailyWeather

@@ -1,4 +1,4 @@
-package com.example.weatherapp.screens.discover.view.shimmer
+package com.example.weatherapp.screens.discover.view.components.shimmer
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background

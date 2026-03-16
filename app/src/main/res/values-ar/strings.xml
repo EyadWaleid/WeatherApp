@@ -37,4 +37,6 @@
     <string name="alert_naming">اسم التحذير</string>
     <string name="no_alerts">أضف أول تنبيه لك</string>
     <string name="checkConectivity">"اعد الاتصال بالشبكه "</string>
+    <string name="locations">مناطق</string>
+    <string name="saved_cities">المدن المحفوظه</string>
 </resources>

@@ -36,4 +36,6 @@
     <string name="alert_naming">Alert name</string>
     <string name="no_alerts">Add your first alert</string>
     <string name="checkConectivity">Check your connectivity</string>
+    <string name="locations">Locations</string>
+    <string name="saved_cities">Saved Cities</string>
 </resources>
