@@ -16,7 +16,7 @@ class LocationHelper (val context: Context){
     private val fusedClient =
         LocationServices.getFusedLocationProviderClient(context)
 
-    fun checkPermissions(): Boolean{
+   fun checkPermissions(): Boolean{
        val permission = ContextCompat.checkSelfPermission(
            context,
            Manifest.permission.ACCESS_FINE_LOCATION
