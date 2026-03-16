@@ -1,7 +1,7 @@
 package com.example.weatherapp.screens.settings.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.weatherapp.data.repo.ISettingsRepo
+import com.example.weatherapp.data.repo.settings.ISettingsRepo
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import com.example.weatherapp.utils.constants.LocationSource
 import com.example.weatherapp.utils.constants.TempUnits

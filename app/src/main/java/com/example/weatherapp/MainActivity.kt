@@ -1,6 +1,5 @@
 package com.example.weatherapp
 
-import android.Manifest
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -38,7 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.weatherapp.data.repo.SettingsRepo
+import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModel
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModelFactory
 import com.example.weatherapp.screens.discover.viewmodel.DiscoverFactoryModel

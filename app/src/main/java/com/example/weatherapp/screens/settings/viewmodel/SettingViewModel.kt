@@ -3,8 +3,8 @@ package com.example.weatherapp.screens.settings.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.weatherapp.data.repo.ISettingsRepo
-import com.example.weatherapp.data.repo.SettingsRepo
+import com.example.weatherapp.data.repo.settings.ISettingsRepo
+import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.utils.connectivity.INetworkMonitor
 import com.example.weatherapp.utils.constants.LocationSource
 import com.example.weatherapp.utils.localization.IAppLocalization

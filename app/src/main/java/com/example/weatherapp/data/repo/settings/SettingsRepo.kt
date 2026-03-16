@@ -1,4 +1,4 @@
-package com.example.weatherapp.data.repo
+package com.example.weatherapp.data.repo.settings
 
 import android.app.Application
 import com.example.weatherapp.data.datasource.local.datasource.UserPreferences

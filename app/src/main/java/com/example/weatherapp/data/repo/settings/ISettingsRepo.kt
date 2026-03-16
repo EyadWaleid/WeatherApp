@@ -1,4 +1,4 @@
-package com.example.weatherapp.data.repo
+package com.example.weatherapp.data.repo.settings
 
 import kotlinx.coroutines.flow.Flow
 
