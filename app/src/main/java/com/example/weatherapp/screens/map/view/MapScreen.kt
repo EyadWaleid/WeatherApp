@@ -42,6 +42,7 @@ import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.style.rememberStyleState
 import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Position
+
 @Composable
 fun FullUi(
     modifier: Modifier = Modifier,
@@ -59,6 +60,7 @@ fun FullUi(
                 initialPosition = when (mapState) {
                     is MapViewModel.MapState.LocationSelected ->
                         (mapState as MapViewModel.MapState.LocationSelected).position
+
                     else -> Position(31.2357, 30.0444)
                 }
             )
@@ -76,7 +78,7 @@ fun FullUi(
                 }
             }
 
-            is MapViewModel.MapState.Idle -> {  }
+            is MapViewModel.MapState.Idle -> {}
 
             is MapViewModel.MapState.LocationSelected -> {
                 val state = mapState as MapViewModel.MapState.LocationSelected
@@ -105,7 +107,7 @@ fun FullUi(
 
 @Composable
 fun MapItem(onClick: (Position) -> Unit, initialPosition: Position) {
-    val myLocation =initialPosition
+    val myLocation = initialPosition
     var markerPosition by remember { mutableStateOf(myLocation) }
     val pinIcon = painterResource(R.drawable.baseline_location_pin_24)
 

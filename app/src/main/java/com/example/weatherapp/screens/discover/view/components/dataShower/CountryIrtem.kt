@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
 import com.example.weatherapp.data.model.entity.FavCity
@@ -58,13 +59,17 @@ fun CountryItem(modifier: Modifier = Modifier, city: FavCity, onClickItem:(FavCi
                 Text(
                     city.name + "," + city.countryCode,
                     style = MaterialTheme.typography.titleMedium,
-                    color = colorResource(R.color.whiteBlue)
+                    color = colorResource(R.color.whiteBlue),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(Modifier.size(8.dp))
                 Text(
                     city.tempDescription,
                     style = MaterialTheme.typography.titleSmall,
-                    color = colorResource(R.color.greyBlue)
+                    color = colorResource(R.color.greyBlue),
+
+
                 )
             }
             Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {

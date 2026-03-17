@@ -1,15 +1,14 @@
 package com.example.weatherapp.data.datasource.local.datasource.alarm
 
 import android.app.Application
+import com.example.weatherapp.data.datasource.local.dao.AlarmDao
 import com.example.weatherapp.data.db.AppDatabase
 import com.example.weatherapp.data.model.entity.UserAlerts
 import kotlinx.coroutines.flow.Flow
 
-class AlarmDataSource(context: Application): IAlarmDataSource {
+class AlarmDataSource(private val alarmDao : AlarmDao): IAlarmDataSource {
 
-    private val alarmDao = AppDatabase.Companion
-        .getInstance(context)
-        .alarmDao()
+
     override suspend fun insertAlarm(userAlerts: UserAlerts): Long {
         return alarmDao.insertUserAlarm(userAlerts)
     }

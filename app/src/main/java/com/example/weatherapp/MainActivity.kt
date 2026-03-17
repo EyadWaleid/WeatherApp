@@ -96,7 +96,10 @@ class MainActivity : ComponentActivity() {
             )
             val snackbarHostState = remember { SnackbarHostState() }
             val alertViewModel: AlertViewModel =
-                viewModel(factory = AlertViewModelFactory(context = this.application))
+                viewModel(factory = AlertViewModelFactory(
+                    repo =app.alertRepo,
+                    networkMonitor = app.networkMonitor
+                ))
             WeatherAppTheme {
                 val navController = rememberNavController()
                 val currentRoute by navController.currentBackStackEntryAsState()

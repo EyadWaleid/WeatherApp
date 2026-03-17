@@ -39,4 +39,10 @@
     <string name="checkConectivity">"اعد الاتصال بالشبكه "</string>
     <string name="locations">مناطق</string>
     <string name="saved_cities">المدن المحفوظه</string>
+    <string name="gps">موقعك الحالي</string>
+    <string name="map">الخريطه</string>
+    <string name="not_alarm">التنبيهات و الأشعارات</string>
+    <string name="saved_alert">التنبيهات المحفوظه</string>
+    <string name="add">اضف</string>
+    <string name="your_country_choice_is">المدينه الحاليه</string>
 </resources>

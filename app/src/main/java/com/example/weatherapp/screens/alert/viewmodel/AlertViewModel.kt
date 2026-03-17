@@ -8,12 +8,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.model.entity.UserAlerts
 import com.example.weatherapp.data.repo.alert.AlertRepo
+import com.example.weatherapp.utils.connectivity.INetworkMonitor
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class AlertViewModel(private  val  context: Application) : ViewModel() {
+class AlertViewModel( private  val  repo:AlertRepo,private val networkMonitor: INetworkMonitor) : ViewModel() {
 
     sealed class AlertState {
         object Loading : AlertState()
@@ -22,7 +23,7 @@ class AlertViewModel(private  val  context: Application) : ViewModel() {
         data class Error(val message: String) : AlertState()
     }
 
-    private val repo = AlertRepo(context)
+
     private val _alertState = MutableStateFlow<AlertState>(AlertState.Loading)
     val alertState: StateFlow<AlertState> = _alertState
     private val _snackbarEvent = MutableStateFlow<String?>(null)
@@ -39,7 +40,7 @@ class AlertViewModel(private  val  context: Application) : ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun insertAlarm(userAlerts: UserAlerts) {
-        if(!NetworkMonitor(context).isInternetAvailable()){
+        if(!networkMonitor.isInternetAvailable()){
             _snackbarEvent.value="check your connectivity"
             return
         }
@@ -50,8 +51,9 @@ class AlertViewModel(private  val  context: Application) : ViewModel() {
 
     }
 
-    fun deleteAlarm(userAlerts: UserAlerts) {
-        if(!NetworkMonitor(context).isInternetAvailable()){
+    fun deleteAlarm(userAlerts: UserAlerts)
+    {
+        if(!networkMonitor.isInternetAvailable()){
             _snackbarEvent.value="check your connectivity"
             return
         }
@@ -60,6 +62,13 @@ class AlertViewModel(private  val  context: Application) : ViewModel() {
         }
 
     }
+    fun checkConnectivity(): Boolean{
+        if(networkMonitor.isInternetAvailable()){
+            return true
+        }
+        _snackbarEvent.value="check your connectivity"
+        return false
+    }
 
 
     fun clearEvent() {
@@ -67,8 +76,8 @@ class AlertViewModel(private  val  context: Application) : ViewModel() {
     }
 }
 
-class AlertViewModelFactory(val context: Application) : ViewModelProvider.Factory {
+class AlertViewModelFactory(private  val  repo:AlertRepo,private val networkMonitor: INetworkMonitor) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return AlertViewModel(context) as T
+        return AlertViewModel(repo,networkMonitor) as T
     }
 }

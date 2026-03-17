@@ -25,6 +25,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +47,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherapp.R
+import com.example.weatherapp.screens.settings.view.components.LanguageDropdown
+import com.example.weatherapp.screens.settings.view.components.LocationTrackerBtnToggle
+import com.example.weatherapp.screens.settings.view.components.TemperatureUnitsBtnToggle
+import com.example.weatherapp.screens.settings.view.components.WindUnitsBtnToggle
 import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.utils.constants.Language
 import com.example.weatherapp.utils.constants.LocationSource
@@ -72,6 +77,11 @@ fun SettingScreen(
                 )
                 settingViewModel.clearEvent()
             }
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            settingViewModel.clearEvent()
         }
     }
     when (userSettingsState) {
@@ -147,6 +157,8 @@ fun SettingScreen(
     }
 }
 
+
+
 @Composable
 fun AppBar(modifier: Modifier = Modifier) {
     val lineColor = colorResource(R.color.blueWithOpcity)
@@ -173,327 +185,10 @@ fun AppBar(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun LocationTrackerBtnToggle(
-    modifier: Modifier = Modifier,
-    locationSource: String,
-    onClick: () -> Unit,
-    settingViewModel: SettingViewModel
-) {
-    var selectedIndex = when (locationSource) {
-        LocationSource.GPS.displayName -> 0
-        LocationSource.MAP.displayName -> 1
-        else -> {
-            0
-        }
-    }
-
-    val options = mutableListOf("GPS", "Map")
-    val icons = listOf(
-        R.drawable.baseline_location_pin_24,
-        R.drawable.outline_map_24
-    )
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .border(
-                BorderStroke(
-                    1.dp,
-                    colorResource(R.color.blueWithOpcity)
-                ),
-                shape = RoundedCornerShape(15.dp)
-            )
-            .background(
-                color = colorResource(R.color.darkBlueWithOpacity),
-                shape = RoundedCornerShape(15)
-            )
-            .padding(4.dp),
-
-        ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            options.forEachIndexed { index, label ->
-                val isSelected = selectedIndex == index
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .padding(5.dp)
-                        .clip(RoundedCornerShape(15.dp))
-                        .background(
-                            if (isSelected)
-                                Color(0xFF3A4A5F)
-                            else
-                                Color.Transparent
-                        )
-                        .clickable {
-                            if (settingViewModel.checkConnectivity()) {
-                                if (selectedIndex == index && index == 0) {
-                                    return@clickable
-                                } else if (index == 0) {
-                                    settingViewModel.setLocationSourceToMap()
-                                    return@clickable
-                                }
-                                selectedIndex = index
-                                onClick()
-                            }
-
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(icons[index]),
-                            contentDescription = "",
-                            tint = colorResource(if (isSelected) R.color.blue else R.color.greyBlue)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = label,
-                            color = if (isSelected)
-                                Color(0xFF2F80ED)
-                            else
-                                Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun TemperatureUnitsBtnToggle(
-    modifier: Modifier = Modifier,
-    tempUInt: String,
-    onClick: (Int) -> Unit
-) {
 
 
-    val selectedIndex = when (tempUInt) {
-        TempUnits.CELSIUS.displayName -> 0
-        TempUnits.FAHRENHEIT.displayName -> 1
-        TempUnits.KELVIN.displayName -> 2
-        else -> 0
-    }
 
-    val options = listOf(R.string.celsius, R.string.fahrenheit, R.string.kelvin)
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .border(
-                BorderStroke(
-                    1.dp,
-                    colorResource(R.color.blueWithOpcity)
-                ),
-                shape = RoundedCornerShape(15.dp)
-            )
-            .background(
-                color = colorResource(R.color.darkBlueWithOpacity),
-                shape = RoundedCornerShape(15)
-            )
-            .padding(4.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            options.forEachIndexed { index, label ->
-                val isSelected = selectedIndex == index
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(15.dp))
-                        .background(
-                            if (isSelected)
-                                Color(0xFF3A4A5F)
-                            else
-                                Color.Transparent
-                        )
-                        .clickable {
-                            if (selectedIndex != index) {
-                                onClick(index)
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
 
-                        Text(
-                            text = stringResource(label),
-                            color = if (isSelected)
-                                Color(0xFF2F80ED)
-                            else
-                                Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
-@Composable
-fun WindUnitsBtnToggle(modifier: Modifier = Modifier, onClick: (Int) -> Unit, windUnit: String) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
-    LaunchedEffect(windUnit) {
-        selectedIndex = when (windUnit) {
-            Units.METERS_PER_SECOND.displayName -> 0
-            Units.MILES_PER_HOUR.displayName -> 1
-            else -> 0
-        }
-    }
 
-    val options = listOf(R.string.wind_speed_in_seeconds, R.string.wind_speed_in_hours)
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .border(
-                BorderStroke(
-                    1.dp,
-                    colorResource(R.color.blueWithOpcity)
-                ),
-                shape = RoundedCornerShape(15.dp)
-            )
-            .background(
-                color = colorResource(R.color.darkBlueWithOpacity),
-                shape = RoundedCornerShape(15)
-
-            )
-            .padding(4.dp),
-
-        ) {
-
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            options.forEachIndexed { index, label ->
-                val isSelected = selectedIndex == index
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .padding(5.dp)
-                        .clip(RoundedCornerShape(15.dp))
-                        .background(
-                            if (isSelected)
-                                Color(0xFF3A4A5F)
-                            else
-                                Color.Transparent
-                        )
-
-                        .clickable {
-                            onClick(index)
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        Text(
-                            text = stringResource(label),
-                            color = if (isSelected)
-                                Color(0xFF2F80ED)
-                            else
-                                Color.Gray,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun LanguageDropdown(languageCode: String, onClick: (String) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedLanguage = languageCode
-    val languages = listOf(Language.ENGLISH, Language.ARABIC)
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                colorResource(R.color.darkBlueWithOpacity),
-                shape = RoundedCornerShape(10.dp)
-            )
-            .clickable { expanded = !expanded }
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(id = R.drawable.outline_globe_24),
-                    tint = Color(0xFF137FEC),
-                    contentDescription = "",
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        stringResource(R.string.display_language),
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
-                    Spacer(modifier = Modifier.size(5.dp))
-                    Text(
-                        if (selectedLanguage == "en") stringResource(Language.ENGLISH.resId) else stringResource(
-                            Language.ARABIC.resId
-                        ), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White
-                    )
-
-                }
-            }
-            Icon(
-                painter = if (expanded) painterResource(R.drawable.outline_arrow_upward_alt_24) else painterResource(
-                    R.drawable.outline_arrow_downward_alt_24
-                ),
-                contentDescription = null,
-                tint = Color.Gray
-            )
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .background(color = colorResource(R.color.darkBlue))
-                .fillMaxWidth()
-        ) {
-            languages.forEach { language ->
-                DropdownMenuItem(
-                    onClick = {
-                        if (selectedLanguage != language.code) {
-                            selectedLanguage = language.code
-                            onClick(selectedLanguage)
-                        }
-                        expanded = false
-                    },
-                    text = {
-                        Text(text = stringResource(language.resId), color = Color.White)
-                    },
-
-                    )
-            }
-        }
-    }
-}

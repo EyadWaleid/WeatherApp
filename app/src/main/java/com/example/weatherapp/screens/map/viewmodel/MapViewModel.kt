@@ -31,6 +31,7 @@ class MapViewModel(
     private val _mapState = MutableStateFlow<MapState>(MapState.Loading)
     val mapState: StateFlow<MapState> = _mapState
 
+
     init {
         viewModelScope.launch {
             val source = settingsRepo.getLocationSource().first()

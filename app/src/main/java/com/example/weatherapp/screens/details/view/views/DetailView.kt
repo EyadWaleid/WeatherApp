@@ -59,11 +59,15 @@ fun ShowDetailWeather(modifier: Modifier = Modifier, detailViewModel: DetailView
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             WeatherAttrItem(icon = R.drawable.humditiy_icon, weatherAttr = R.string.HUMIDITY, value = weatherCountry.humidity.toString(), subvalue = weatherCountry.humidityCondition)
+            Spacer(Modifier.width(10.dp))
             WeatherAttrItem(icon = R.drawable.wind, weatherAttr = R.string.WIND, value = weatherCountry.wind.toInt().toString()+" "+windUnit, subvalue = weatherCountry.windDirction)
+
         }
         Spacer(Modifier.size(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             WeatherAttrItem(icon = R.drawable.pressure, weatherAttr = R.string.PRESSURE, value = weatherCountry.pressure.toString(), subvalue = weatherCountry.pressureCondition)
+            Spacer(Modifier.width(10.dp))
+
             WeatherAttrItem(icon = R.drawable.weatherpage, weatherAttr = R.string.CLOUDCOVER, value = weatherCountry.cloudCover.toString(), subvalue = " ")
         }
 

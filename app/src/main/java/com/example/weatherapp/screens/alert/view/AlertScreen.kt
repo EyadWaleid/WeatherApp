@@ -107,15 +107,14 @@ fun AlertScreen(modifier: Modifier = Modifier, alertViewModel: AlertViewModel,sn
                                     .padding(16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(
-                                    "Notification & Alarm alerts",
+                                Text(stringResource(R.string.no_alerts),
                                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                                     color = colorResource(R.color.greyBlue),
 
                                     )
                                 Spacer(modifier = Modifier.size(10.dp))
                                 Text(
-                                    "${(alertState as AlertViewModel.AlertState.Data).userAlerts.size}  Alerts",
+                                    "${(alertState as AlertViewModel.AlertState.Data).userAlerts.size}"+stringResource(R.string.saved_alert),
                                     color = colorResource(R.color.blue),
                                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium)
                                 )
@@ -175,7 +174,10 @@ fun AlertScreen(modifier: Modifier = Modifier, alertViewModel: AlertViewModel,sn
             onClick = { if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
-                showBottomSheet = true
+                if (alertViewModel.checkConnectivity()){
+                    showBottomSheet = true
+                }
+
             } }
         ) {
             Icon(painter = painterResource(R.drawable.outline_add_24), contentDescription = "")

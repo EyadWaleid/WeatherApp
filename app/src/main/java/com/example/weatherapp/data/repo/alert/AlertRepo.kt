@@ -18,8 +18,7 @@ import com.example.weatherapp.utils.constants.TimeUtils
 import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.TimeUnit
 
-class AlertRepo(private val context: Application) {
-    private val alarmDataSource = AlarmDataSource(context)
+class AlertRepo(private val alarmDataSource :AlarmDataSource,private  val workManager: WorkManager) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun insertAlarm(userAlerts: UserAlerts) {
@@ -55,7 +54,7 @@ class AlertRepo(private val context: Application) {
             .addTag(alarm.id.toString())
             .setConstraints(constraints)
             .build()
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+       workManager.enqueueUniquePeriodicWork(
             alarm.id.toString(),
             ExistingPeriodicWorkPolicy.UPDATE,
             workRequest
@@ -64,8 +63,7 @@ class AlertRepo(private val context: Application) {
 
 
    private fun cancelAlarm(alarmId: Long) {
-        WorkManager.getInstance(context)
-            .cancelUniqueWork(alarmId.toString())
+       workManager.cancelUniqueWork(alarmId.toString())
     }
 
 

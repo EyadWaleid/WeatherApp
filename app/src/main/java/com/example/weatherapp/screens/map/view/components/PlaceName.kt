@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
 import org.maplibre.spatialk.geojson.Position
@@ -20,15 +21,19 @@ import org.maplibre.spatialk.geojson.Position
 
 @Composable
 fun PlaceName(modifier: Modifier = Modifier, mypostion: Position, onClick: (Position) -> Unit, place: String){
-    Box (modifier.fillMaxWidth().clip(shape = RoundedCornerShape(15.dp)).background(color = colorResource(
-        R.color.darkBlueWithOpacity))) {
+    Box (modifier
+        .fillMaxWidth()
+        .clip(shape = RoundedCornerShape(15.dp))
+        .background(
+            color = colorResource(
+                R.color.darkBlueWithOpacity
+            )
+        )) {
         Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-
-            Text("Your Country choice is", style = MaterialTheme.typography.titleMedium, color = colorResource(R.color.whiteBlue))
-
+            Text(stringResource(R.string.your_country_choice_is), style = MaterialTheme.typography.titleMedium, color = colorResource(R.color.whiteBlue))
             Text(place)
             Button(onClick = {onClick(mypostion)}) {
-                Text("Add", style = MaterialTheme.typography.bodySmall, color = colorResource(R.color.whiteBlue))
+                Text(stringResource(R.string.add), style = MaterialTheme.typography.bodySmall, color = colorResource(R.color.whiteBlue))
             }
         }
 
