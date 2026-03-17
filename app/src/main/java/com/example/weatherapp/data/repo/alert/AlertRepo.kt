@@ -29,8 +29,7 @@ class AlertRepo(private val context: Application) {
         )
         )
     }
-
-    suspend fun getAllAlarms(): Flow<List<UserAlerts>> = alarmDataSource.getAllAlarms()
+     fun getAllAlarms(): Flow<List<UserAlerts>> = alarmDataSource.getAllAlarms()
     suspend fun deleteAlarm(userAlerts: UserAlerts) {
         alarmDataSource.deleteAlarm(userAlerts)
         cancelAlarm(userAlerts.id)
@@ -38,7 +37,6 @@ class AlertRepo(private val context: Application) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun scheduleAlarm(alarm: UserAlerts) {
-        Log.d("AL","Schaduled")
 
         val delay = TimeUtils.calculateDelay(alarm.from)
         val constraints = Constraints.Builder()

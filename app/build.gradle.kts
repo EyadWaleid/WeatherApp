@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.androidTestImplementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -65,6 +67,9 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.androidx.ui.geometry)
     implementation(libs.androidx.appcompat)
+    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.junit)
     ksp(libs.room.compiler)
     implementation(libs.locationServices)
     implementation(libs.kotlinx.serialization.json)
@@ -89,4 +94,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+
+    androidTestImplementation("androidx.test:core-ktx:1.5.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
 }

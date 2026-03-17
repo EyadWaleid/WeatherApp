@@ -5,6 +5,7 @@ import com.example.weatherapp.data.datasource.local.datasource.fav.FavLocalDataS
 import com.example.weatherapp.data.datasource.local.datasource.usersettings.UserPreferences
 import com.example.weatherapp.data.datasource.local.datasource.weather.WeatherLocalDatasource
 import com.example.weatherapp.data.datasource.remote.WeatherDataSource
+import com.example.weatherapp.data.db.AppDatabase
 import com.example.weatherapp.data.repo.homeRepo.IWeatherHomeRepo
 import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
 import com.example.weatherapp.data.repo.settings.ISettingsRepo
@@ -19,12 +20,12 @@ import com.example.weatherapp.utils.location.ILocationHelper
 import com.example.weatherapp.utils.location.LocationHelper
 
 class WorkerApplication : Application() {
-
+    val database by lazy { AppDatabase.getInstance(this)}
     val userPreferences by lazy { UserPreferences(this) }
     val settingsRepo: ISettingsRepo by lazy { SettingsRepo(userPreferences) }
     val weatherDataSource by lazy { WeatherDataSource() }
-    val localDatasource by lazy { WeatherLocalDatasource(this) }
-    val favLocalDataSource by lazy { FavLocalDataSource(this) }
+    val localDatasource by lazy { WeatherLocalDatasource(database.forecastDao()) }
+    val favLocalDataSource by lazy { FavLocalDataSource(database.favDao()) }
     val homeRepo: IWeatherHomeRepo by lazy {
         WeatherHomeRepo(
             weatherDataSource, localDatasource,
