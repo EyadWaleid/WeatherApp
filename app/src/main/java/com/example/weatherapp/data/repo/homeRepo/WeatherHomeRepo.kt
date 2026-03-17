@@ -1,28 +1,26 @@
 package com.example.weatherapp.data.repo.homeRepo
-import android.app.Application
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.weatherapp.data.datasource.local.datasource.FavLocalDataSource
-import com.example.weatherapp.data.datasource.local.datasource.WeatherLocalDatasource
-import com.example.weatherapp.data.datasource.remote.WeatherDataSource
+import com.example.weatherapp.data.datasource.local.datasource.fav.IFavLocalDataSource
+import com.example.weatherapp.data.datasource.local.datasource.weather.IWeatherLocalDatasource
+import com.example.weatherapp.data.datasource.remote.IWeatherRemoteDataSource
 import com.example.weatherapp.data.model.entity.CountryForecast
 import com.example.weatherapp.data.model.entity.FavCity
 import com.example.weatherapp.utils.AppException
 import com.example.weatherapp.utils.NetworkExceptions
-import com.example.weatherapp.utils.WeatherMapper
+import com.example.weatherapp.utils.WeatherMapper.mapToCountryForecast
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 class WeatherHomeRepo(
-    val weatherDataSource: WeatherDataSource = WeatherDataSource(),
-    val context: Application,
-    val localDatasource: WeatherLocalDatasource = WeatherLocalDatasource(context.applicationContext),
-    val favLocalDataSource: FavLocalDataSource = FavLocalDataSource(context = context),
-
+   private val weatherDataSource: IWeatherRemoteDataSource,
+    private  val localDatasource: IWeatherLocalDatasource,
+   private val favLocalDataSource: IFavLocalDataSource
     ) : IWeatherHomeRepo{
-
-
     // Download the data to database and then View
     @RequiresApi(Build.VERSION_CODES.O)
   override  suspend fun loadCountryWeatherData(
@@ -35,12 +33,9 @@ class WeatherHomeRepo(
         return try {
             val result = weatherDataSource.getWeatherCountryInfo(lat = lat, lon = lon, units, lang)
                 val forecastData = result.getOrThrow()
-                val countryWeather = CountryForecast(
-                    city = forecastData.city.name,
-                    long = forecastData.city.coord.lon,
-                    lat = forecastData.city.coord.lat,
-                    countryCode = forecastData.city.country,
-                    weatherOfDays = WeatherMapper.mapToDailyWeather(forecastData, lang = lang)
+                val countryWeather = mapToCountryForecast(
+                    forecastData,
+                    lang =lang
                 )
 
 
@@ -48,9 +43,9 @@ class WeatherHomeRepo(
                 Result.success(countryWeather)
 
         } catch (e: Exception) {
-            val isNetworkError = e is java.net.UnknownHostException
-                    || e is java.net.SocketTimeoutException
-                    || e is java.io.IOException
+            val isNetworkError = e is UnknownHostException
+                    || e is SocketTimeoutException
+                    || e is IOException
 
             if (isNetworkError) {
                 val cached = localDatasource.getForecast()
@@ -86,13 +81,8 @@ class WeatherHomeRepo(
             lang = lang
         ).getOrThrow()
 
-        CountryForecast(
-            city = forecastData.city.name,
-            countryCode = forecastData.city.country,
-            long = forecastData.city.coord.lon,
-            lat = forecastData.city.coord.lat,
-            weatherOfDays = WeatherMapper.mapToDailyWeather(forecastData, lang = lang)
-        )
+      val contryForecast = mapToCountryForecast(forecastData = forecastData, lang = lang)
+     contryForecast
     }
 
     // Observe the database of FavCountry table

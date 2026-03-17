@@ -37,6 +37,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weatherapp.data.datasource.local.datasource.fav.FavLocalDataSource
+import com.example.weatherapp.data.datasource.local.datasource.usersettings.UserPreferences
+import com.example.weatherapp.data.datasource.local.datasource.weather.WeatherLocalDatasource
+import com.example.weatherapp.data.datasource.remote.WeatherDataSource
 import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
 import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModel
@@ -51,6 +55,7 @@ import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.utils.constants.Constants
 import com.example.weatherapp.utils.routes.Route
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
+import com.example.weatherapp.utils.geoCoder.GeocoderHelper
 import com.example.weatherapp.utils.localization.AppLocalization
 import com.example.weatherapp.utils.location.LocationHelper
 import kotlinx.coroutines.launch
@@ -64,11 +69,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val settingsRepo = SettingsRepo(application)
-            val homeRepo = WeatherHomeRepo(context = application)
+            val userSettings= UserPreferences(application)
+            val settingsRepo = SettingsRepo(userSettings)
+            val weatherDataSource=WeatherDataSource()
+            val localDatasource= WeatherLocalDatasource(context = this)
+            val favLocalDataSource= FavLocalDataSource(context = application)
+            val homeRepo = WeatherHomeRepo(weatherDataSource,localDatasource,favLocalDataSource)
             val networkMonitor = NetworkMonitor(application)
             val locationHelper = LocationHelper(application)
             val localizationManager = AppLocalization(this)
+            val geocoderHelper= GeocoderHelper(this)
             val discoverViewModel: DiscoverViewModel =
                 viewModel(factory = DiscoverFactoryModel(
                     userSettings = settingsRepo,
@@ -146,7 +156,11 @@ class MainActivity : ComponentActivity() {
                         snackbarHostState = snackbarHostState,
                         discoverViewModel = discoverViewModel,
                         alertViewModel = alertViewModel,
-                        context = this.application
+                        context = this.application,
+                        settingsRepo = settingsRepo,
+                        geocoder = geocoderHelper,
+                        weatherRepo = homeRepo,
+                        locationHelper = locationHelper
                     )
 
 

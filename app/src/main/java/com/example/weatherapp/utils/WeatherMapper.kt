@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import com.example.weatherapp.data.model.entity.DailyWeather
 import com.example.weatherapp.data.model.entity.HourlyWeather
 import com.example.weatherapp.data.model.dto.ForecastData
+import com.example.weatherapp.data.model.entity.CountryForecast
 import com.example.weatherapp.utils.constants.TempUnits
 import java.time.LocalDate.*
 import java.time.format.TextStyle
@@ -127,6 +128,16 @@ object WeatherMapper {
             "m/s" -> wind / 2.237
             else -> wind
         }
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun mapToCountryForecast(forecastData: ForecastData, lang: String): CountryForecast {
+        return CountryForecast(
+            city = forecastData.city.name,
+            long = forecastData.city.coord.lon,
+            lat = forecastData.city.coord.lat,
+            countryCode = forecastData.city.country,
+            weatherOfDays = mapToDailyWeather(forecastData, lang)
+        )
     }
       fun getUnits(unit: String):String{
         if(unit == TempUnits.FAHRENHEIT.displayName){

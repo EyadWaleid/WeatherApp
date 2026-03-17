@@ -1,6 +1,5 @@
 package com.example.weatherapp.screens.home.view_model
 
-import android.app.Application
 import android.os.Build
 import android.util.Log
 import com.example.weatherapp.utils.NetworkExceptions
@@ -10,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.model.entity.DailyWeather
 import com.example.weatherapp.data.model.entity.HourlyWeather
+import com.example.weatherapp.data.repo.homeRepo.IWeatherHomeRepo
 import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
 import com.example.weatherapp.data.repo.settings.ISettingsRepo
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 class HomeViewModel(
-    private val repo: WeatherHomeRepo,
+    private val repo: IWeatherHomeRepo,
     private val networkMonitor: INetworkMonitor,
     private val userSettingsRepo: ISettingsRepo,
     private val locationProvider: ILocationHelper

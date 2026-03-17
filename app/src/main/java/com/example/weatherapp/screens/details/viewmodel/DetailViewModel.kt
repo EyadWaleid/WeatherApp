@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.model.entity.DailyWeather
 import com.example.weatherapp.data.model.entity.HourlyWeather
+import com.example.weatherapp.data.repo.homeRepo.IWeatherHomeRepo
 import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
+import com.example.weatherapp.data.repo.settings.ISettingsRepo
 import com.example.weatherapp.utils.constants.Units
 import com.example.weatherapp.utils.constants.UserSettings
 import com.example.weatherapp.utils.WeatherMapper.getUnits
@@ -17,21 +19,22 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class DetailViewModel(
-    private val context: Application,
+    private val repo: IWeatherHomeRepo,
+    private val settingsRepo: ISettingsRepo,
     private val lat: Double,
     private val long: Double
 ) : ViewModel() {
-    private val repo = WeatherHomeRepo(context = context)
-    private val settings = SettingsRepo(context)
+
     private val _detailData = MutableStateFlow<WeatherDetailState>(WeatherDetailState.IsLoading)
     val detailData: StateFlow<WeatherDetailState> = _detailData
     private var currentSettings = UserSettings()
+
     init {
         viewModelScope.launch {
             combine(
-                settings.getTempUnit(),
-                settings.getLanguage(),
-                settings.getWindUnit()
+                settingsRepo.getTempUnit(),
+                settingsRepo.getLanguage(),
+                settingsRepo.getWindUnit()
             ) { temp, lang, wind ->
                 UserSettings(
                     tempUnit = getUnits(temp),
@@ -42,9 +45,9 @@ class DetailViewModel(
                 currentSettings = settings
                 loadWeatherData()
             }
-
         }
     }
+
     private fun loadWeatherData() {
         viewModelScope.launch {
             val result = repo.fetchCountryWeatherData(
@@ -59,10 +62,8 @@ class DetailViewModel(
                     val convertedDays = when {
                         currentSettings.tempUnit == "imperial" && currentSettings.windUnit == Units.METERS_PER_SECOND.displayName ->
                             response.weatherOfDays.map { it.copy(wind = it.wind / 2.237) }
-
                         currentSettings.tempUnit != "imperial" && currentSettings.windUnit == Units.MILES_PER_HOUR.displayName ->
                             response.weatherOfDays.map { it.copy(wind = it.wind * 2.237) }
-
                         else -> response.weatherOfDays
                     }
                     _detailData.value = WeatherDetailState.WeatherData(
@@ -74,15 +75,14 @@ class DetailViewModel(
                         windUnit = currentSettings.windUnit,
                         tempUnit = currentSettings.tempUnit
                     )
-
                 },
                 {
                     _detailData.value = WeatherDetailState.OnError(it.message.toString())
                 }
             )
-
         }
     }
+
     sealed class WeatherDetailState {
         object IsLoading : WeatherDetailState()
         class OnError(val errorMessage: String) : WeatherDetailState()
@@ -98,9 +98,28 @@ class DetailViewModel(
     }
 }
 
-class DetialFactoryViewModel(val context: Application, val lat: Double, val long: Double) :
+class DetailViewModelFactory(
+    private val repo: IWeatherHomeRepo,
+    private val settingsRepo: ISettingsRepo,
+    private val lat: Double,
+    private val long: Double
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return DetailViewModel(
+            repo = repo,
+            settingsRepo = settingsRepo,
+            lat = lat,
+            long = long
+        ) as T
+    }
+}
+
+class DetialFactoryViewModel( private val repo: IWeatherHomeRepo,
+                              private val settingsRepo: ISettingsRepo,
+                              private val lat: Double,
+                              private val long: Double) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return DetailViewModel(context = context, lat = lat, long = long) as T
+        return DetailViewModel(repo,settingsRepo,lat,long) as T
     }
 }

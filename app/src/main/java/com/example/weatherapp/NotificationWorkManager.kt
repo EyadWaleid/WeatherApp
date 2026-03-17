@@ -11,6 +11,10 @@ import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.example.weatherapp.data.datasource.local.datasource.fav.FavLocalDataSource
+import com.example.weatherapp.data.datasource.local.datasource.usersettings.UserPreferences
+import com.example.weatherapp.data.datasource.local.datasource.weather.WeatherLocalDatasource
+import com.example.weatherapp.data.datasource.remote.WeatherDataSource
 import com.example.weatherapp.data.model.entity.CountryForecast
 import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
@@ -33,11 +37,14 @@ class NotificationWorkManager(
         val  alarmType=inputData.getString(WorkerKeys.ALARM_TYPE.key)
         val to = inputData.getString(WorkerKeys.TO.key)
         if (alarmId == -1 || notificationId == -1) return Result.failure()
-        val settingsRepo = SettingsRepo(applicationContext as Application)
-        val weatherRepo = WeatherHomeRepo(context = applicationContext as Application)
+        val userPreferences= UserPreferences(applicationContext)
+        val settingsRepo = SettingsRepo(userPreferences = userPreferences )
+        val weatherRepo = WeatherHomeRepo(WeatherDataSource(), WeatherLocalDatasource(applicationContext),
+            FavLocalDataSource(applicationContext)
+        )
 
         return try {
-            val (lon, lat) = getLocation(settingsRepo)
+            val (lon, lat) = getLocation(settingsRepo,weatherRepo)
             val units = settingsRepo.getTempUnit().first()
             val lang = settingsRepo.getLanguage().first()
             val result = weatherRepo.loadCountryWeatherData(
@@ -98,7 +105,7 @@ class NotificationWorkManager(
         applicationContext.startForegroundService(intent)
     }
   // fetch Location
-    private suspend fun getLocation(settingsRepo: SettingsRepo): Pair<Double, Double> {
+    private suspend fun getLocation(settingsRepo: SettingsRepo,weatherRepo: WeatherHomeRepo): Pair<Double, Double> {
         val source = settingsRepo.getLocationSource().first()
         return if (source == LocationSource.MAP.displayName) {
             settingsRepo.getMapLocation().first()
@@ -109,20 +116,15 @@ class NotificationWorkManager(
                 if (location != null) {
                     Pair(location.longitude, location.latitude)
                 } else {
-                    getCachedLocation()
+                    getCachedLocation(weatherRepo)
                 }
             } else {
-                getCachedLocation()
+                getCachedLocation(weatherRepo)
             }
         }
     }
   // get cachedLocation
-    private suspend fun getCachedLocation(): Pair<Double, Double> {
-        val weatherRepo = WeatherHomeRepo(
-
-            context = applicationContext as Application,
-
-            )
+    private suspend fun getCachedLocation(weatherRepo : WeatherHomeRepo): Pair<Double, Double> {
         val result = weatherRepo.getSavedWeatherForecast()
         return result.fold(
             onSuccess = { forecast ->

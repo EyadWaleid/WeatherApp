@@ -6,13 +6,13 @@ import com.example.weatherapp.data.network.AppNetwork
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class WeatherDataSource {
+class WeatherDataSource: IWeatherRemoteDataSource {
     val weatherService : WeatherAppService= AppNetwork.weatherService
-    suspend fun getWeatherCountryInfo(
+    override suspend fun getWeatherCountryInfo(
         lat: Double,
         lon: Double,
-        units: String = "metric",
-        lang: String = "en"
+        units: String ,
+        lang: String
     ): Result<ForecastData> = runCatching {
         val result = weatherService.getCurrentWeather(lat = lat, lon = lon, units = units, lang = lang)
         result.body() ?: ForecastData.empty()

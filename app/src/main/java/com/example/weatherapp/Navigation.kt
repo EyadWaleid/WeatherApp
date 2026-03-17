@@ -18,6 +18,14 @@ import com.example.weatherapp.screens.settings.view.SettingScreen
 import com.example.weatherapp.utils.routes.Route
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.toRoute
+import com.example.weatherapp.data.datasource.local.datasource.fav.FavLocalDataSource
+import com.example.weatherapp.data.datasource.local.datasource.usersettings.UserPreferences
+import com.example.weatherapp.data.datasource.local.datasource.weather.WeatherLocalDatasource
+import com.example.weatherapp.data.datasource.remote.WeatherDataSource
+import com.example.weatherapp.data.repo.homeRepo.IWeatherHomeRepo
+import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
+import com.example.weatherapp.data.repo.settings.ISettingsRepo
+import com.example.weatherapp.data.repo.settings.SettingsRepo
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModel
 import com.example.weatherapp.screens.details.view.views.DetialScreen
 import com.example.weatherapp.screens.details.viewmodel.DetailViewModel
@@ -28,6 +36,9 @@ import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.screens.map.view.FullUi
 import com.example.weatherapp.screens.map.viewmodel.MapFactory
 import com.example.weatherapp.screens.map.viewmodel.MapViewModel
+import com.example.weatherapp.utils.geoCoder.IGeocoder
+import com.example.weatherapp.utils.location.ILocationHelper
+
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("RestrictedApi")
 @Composable
@@ -39,7 +50,12 @@ fun Navigation(
     settingViewModel: SettingViewModel,
     context: Application,
     snackbarHostState: SnackbarHostState,
-    alertViewModel: AlertViewModel) {
+    alertViewModel: AlertViewModel,
+    settingsRepo: ISettingsRepo,
+    weatherRepo: IWeatherHomeRepo,
+    locationHelper: ILocationHelper,
+    geocoder: IGeocoder
+) {
     NavHost(
         startDestination = Route.HomeScreen,
         navController = navHostController,
@@ -158,7 +174,7 @@ fun Navigation(
 
         composable<Route.FullUi> { backStackEntry ->
             val mode = backStackEntry.toRoute<Route.FullUi>().mode
-            val mapViewModel: MapViewModel = viewModel(factory = MapFactory(context))
+            val mapViewModel: MapViewModel = viewModel(factory = MapFactory(geocoder = geocoder, settingsRepo = settingsRepo, locationProvider = locationHelper))
             FullUi(
                 modifier = modifier,
                 mode = mode,
@@ -180,7 +196,10 @@ fun Navigation(
             val lat = backStackEntry.toRoute<Route.DetailScreen>().lat
             val long = backStackEntry.toRoute<Route.DetailScreen>().long
             val detailViewModel: DetailViewModel = viewModel(
-                factory = DetialFactoryViewModel(context = context, lat = lat, long = long)
+                factory = DetialFactoryViewModel(
+                   weatherRepo, lat = lat, long = long,
+                    settingsRepo = SettingsRepo(userPreferences = UserPreferences(context)
+                ))
             )
             DetialScreen(modifier = modifier, detailsViewModel = detailViewModel)
         }
