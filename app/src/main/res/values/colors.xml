@@ -10,7 +10,14 @@
     <color name="darkBlue">#FF101922</color>
     <color name="blueWithOpcity">#0D137FEC</color>
     <color name="darkBlueWithOpacity">#801E293B</color>
-
-    <color name="greyBlue">#FF94A3B8</color>
+    <color name="whiteBlue">#F1F5F9</color>
+    <color name="cardColour">#1A137FEC</color>
+    <color name="storkeColour">#33137FEC</color>
+    <color name="greyBlue">#94A3B8</color>
+    <color name="greyBlueLight">  #FFBDCAD6</color>
+    <color name="greyBlueDark">   #FF6B7A8A</color>
     <color name="blue">#FF137FEC</color>
+
+    <color name="lightDarkBlue"> #1E293B</color>
+    <color name="darkSlateBlue">#334155</color>
 </resources>

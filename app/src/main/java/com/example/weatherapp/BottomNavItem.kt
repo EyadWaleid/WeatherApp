@@ -1,5 +1,5 @@
 package com.example.weatherapp
 
-import com.example.weatherapp.utils.Route
+import com.example.weatherapp.utils.routes.Route
 
-data class BottomNavItem(val name:Int , val icon:Int,val route: Route )
+data class BottomNaveItem(val name:Int , val icon:Int,val route: Route)
