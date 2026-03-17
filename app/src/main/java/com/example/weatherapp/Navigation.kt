@@ -198,8 +198,7 @@ fun Navigation(
             val detailViewModel: DetailViewModel = viewModel(
                 factory = DetialFactoryViewModel(
                    weatherRepo, lat = lat, long = long,
-                    settingsRepo = SettingsRepo(userPreferences = UserPreferences(context)
-                ))
+                    settingsRepo = settingsRepo)
             )
             DetialScreen(modifier = modifier, detailsViewModel = detailViewModel)
         }

@@ -17,15 +17,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 
 class NotificationService : Service() {
-
     override fun onBind(intent: Intent): IBinder? = null
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels()
     }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == "DISMISS_NOTIFICATION") {

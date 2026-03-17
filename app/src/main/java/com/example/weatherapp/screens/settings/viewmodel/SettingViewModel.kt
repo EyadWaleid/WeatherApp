@@ -131,7 +131,7 @@ class SettingViewModel(
 }
 
 class SettingViewModelFactory(
-    val settingsRepo: SettingsRepo,
+    val settingsRepo: ISettingsRepo,
     val networkMonitor: INetworkMonitor,
     val appLocalization: IAppLocalization
 ) :

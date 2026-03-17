@@ -2,6 +2,7 @@ package com.example.weatherapp.data.repo.alert
 
 import android.app.Application
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.work.Constraints
 import androidx.work.Data
@@ -37,6 +38,7 @@ class AlertRepo(private val context: Application) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun scheduleAlarm(alarm: UserAlerts) {
+        Log.d("AL","Schaduled")
 
         val delay = TimeUtils.calculateDelay(alarm.from)
         val constraints = Constraints.Builder()
@@ -63,13 +65,6 @@ class AlertRepo(private val context: Application) {
 
 
 
-    suspend fun turnOffAlarm(alarmId: Long) {
-        val alarm = alarmDataSource.getAlarmById(alarmId)
-        alarm?.let { it ->
-            alarmDataSource.updateAlarm(it.copy(isOn = false))
-        }
-        cancelAlarm(alarmId)
-    }
    private fun cancelAlarm(alarmId: Long) {
         WorkManager.getInstance(context)
             .cancelUniqueWork(alarmId.toString())

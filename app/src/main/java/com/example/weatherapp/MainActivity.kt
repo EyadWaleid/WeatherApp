@@ -57,6 +57,7 @@ import com.example.weatherapp.utils.routes.Route
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
 import com.example.weatherapp.utils.geoCoder.GeocoderHelper
 import com.example.weatherapp.utils.localization.AppLocalization
+import com.example.weatherapp.utils.localization.IAppLocalization
 import com.example.weatherapp.utils.location.LocationHelper
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -69,35 +70,27 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val userSettings= UserPreferences(application)
-            val settingsRepo = SettingsRepo(userSettings)
-            val weatherDataSource=WeatherDataSource()
-            val localDatasource= WeatherLocalDatasource(context = this)
-            val favLocalDataSource= FavLocalDataSource(context = application)
-            val homeRepo = WeatherHomeRepo(weatherDataSource,localDatasource,favLocalDataSource)
-            val networkMonitor = NetworkMonitor(application)
-            val locationHelper = LocationHelper(application)
-            val localizationManager = AppLocalization(this)
-            val geocoderHelper= GeocoderHelper(this)
+            val app = application as WorkerApplication
+            val localizationManager: IAppLocalization = AppLocalization(this)
             val discoverViewModel: DiscoverViewModel =
                 viewModel(factory = DiscoverFactoryModel(
-                    userSettings = settingsRepo,
-                    repo =homeRepo,
-                    networkMonitor = networkMonitor,
+                    userSettings = app.settingsRepo,
+                    repo =app.homeRepo,
+                    networkMonitor = app.networkMonitor,
                 ))
             val weahtherViewModel: HomeViewModel =
                 viewModel(
                     factory = WeatherFactory(
-                        networkMonitor = networkMonitor,
-                        repo = homeRepo,
-                        userSettingsRepo = settingsRepo,
-                        locationProvider = locationHelper,
+                        networkMonitor = app.networkMonitor ,
+                        repo = app. homeRepo ,
+                        userSettingsRepo = app.settingsRepo,
+                        locationProvider = app.locationHelper,
                     )
                 )
             val settingViewModel: SettingViewModel = viewModel(
                 factory = SettingViewModelFactory(
-                    settingsRepo = settingsRepo,
-                    networkMonitor = networkMonitor,
+                    settingsRepo = app.settingsRepo,
+                    networkMonitor = app.networkMonitor,
                     appLocalization = localizationManager
                 )
             )
@@ -157,10 +150,10 @@ class MainActivity : ComponentActivity() {
                         discoverViewModel = discoverViewModel,
                         alertViewModel = alertViewModel,
                         context = this.application,
-                        settingsRepo = settingsRepo,
-                        geocoder = geocoderHelper,
-                        weatherRepo = homeRepo,
-                        locationHelper = locationHelper
+                        settingsRepo = app.settingsRepo,
+                        geocoder = app.geocoderHelper,
+                        weatherRepo = app.homeRepo,
+                        locationHelper = app.locationHelper
                     )
 
 

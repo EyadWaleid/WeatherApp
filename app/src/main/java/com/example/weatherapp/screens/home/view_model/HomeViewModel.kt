@@ -207,10 +207,10 @@ class HomeViewModel(
 
 @Suppress("UNCHECKED_CAST")
 class WeatherFactory(
-    private val repo: WeatherHomeRepo,
-    private val networkMonitor: NetworkMonitor,
-    private val userSettingsRepo: SettingsRepo,
-    private val locationProvider: LocationHelper
+    private val repo: IWeatherHomeRepo,
+    private val networkMonitor: INetworkMonitor,
+    private val userSettingsRepo: ISettingsRepo,
+    private val locationProvider: ILocationHelper
 ) : ViewModelProvider.Factory {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

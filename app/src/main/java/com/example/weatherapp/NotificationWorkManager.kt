@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
@@ -34,44 +35,46 @@ class NotificationWorkManager(
     override suspend fun doWork(): Result {
         val alarmId = inputData.getInt(WorkerKeys.ALARM_ID.key, -1)
         val notificationId = inputData.getInt(WorkerKeys.NOTIFICATION_ID.key, -1)
-        val  alarmType=inputData.getString(WorkerKeys.ALARM_TYPE.key)
+        val alarmType = inputData.getString(WorkerKeys.ALARM_TYPE.key)
         val to = inputData.getString(WorkerKeys.TO.key)
+
         if (alarmId == -1 || notificationId == -1) return Result.failure()
-        val userPreferences= UserPreferences(applicationContext)
-        val settingsRepo = SettingsRepo(userPreferences = userPreferences )
-        val weatherRepo = WeatherHomeRepo(WeatherDataSource(), WeatherLocalDatasource(applicationContext),
-            FavLocalDataSource(applicationContext)
-        )
+
+
+        val app = applicationContext as WorkerApplication
+        val settingsRepo = app.settingsRepo
+        val weatherRepo = app.homeRepo
 
         return try {
-            val (lon, lat) = getLocation(settingsRepo,weatherRepo)
+            val (lon, lat) = getLocation(settingsRepo as SettingsRepo,
+                weatherRepo as WeatherHomeRepo
+            )
             val units = settingsRepo.getTempUnit().first()
             val lang = settingsRepo.getLanguage().first()
-            val result = weatherRepo.loadCountryWeatherData(
+
+            weatherRepo.loadCountryWeatherData(
                 lon = lon,
                 lat = lat,
                 units = getUnits(units),
                 lang = lang
-            )
-            result.fold(
+            ).fold(
                 onSuccess = { forecast ->
-                    showNotification(
-                        forecast, notificationId,
-                        alarmType = alarmType
-                    )
+                    showNotification(forecast, notificationId, alarmType)
                     if (isExceededToTime(to)) {
                         WorkManager.getInstance(applicationContext)
                             .cancelUniqueWork(alarmId.toString())
+                        Log.e("AL", "Cancelled")
 
                     }
                     Result.success()
                 },
-                onFailure = {
-
+                onFailure = { e ->
+                    Log.e("AL", "failure: ${e.message}")
                     Result.retry()
                 }
             )
         } catch (e: Exception) {
+            Log.e("AL", "CRASH: ${e.message}", e)
             Result.retry()
         }
     }
