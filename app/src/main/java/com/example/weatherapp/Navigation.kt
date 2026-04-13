@@ -36,6 +36,8 @@ import com.example.weatherapp.screens.settings.viewmodel.SettingViewModel
 import com.example.weatherapp.screens.map.view.FullUi
 import com.example.weatherapp.screens.map.viewmodel.MapFactory
 import com.example.weatherapp.screens.map.viewmodel.MapViewModel
+import com.example.weatherapp.screens.onboard.OnBoard
+import com.example.weatherapp.screens.splash.SplashScreen
 import com.example.weatherapp.utils.geoCoder.IGeocoder
 import com.example.weatherapp.utils.location.ILocationHelper
 
@@ -57,7 +59,7 @@ fun Navigation(
     geocoder: IGeocoder
 ) {
     NavHost(
-        startDestination = Route.HomeScreen,
+        startDestination = Route.SplashScreen,
         navController = navHostController,
         enterTransition = {
             slideIntoContainer(
@@ -149,6 +151,9 @@ fun Navigation(
                 }
             )
         }
+        composable <Route.SplashScreen> {
+            SplashScreen(modifier,navHostController)
+        }
 
         composable<Route.SettingsScreen>(
             enterTransition = {
@@ -201,6 +206,9 @@ fun Navigation(
                     settingsRepo = settingsRepo)
             )
             DetialScreen(modifier = modifier, detailsViewModel = detailViewModel)
+        }
+        composable <Route.OnBoardScreen> {
+            OnBoard(modifier,navHostController)
         }
     }
 }

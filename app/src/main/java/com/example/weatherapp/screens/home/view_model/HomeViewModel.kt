@@ -51,6 +51,7 @@ class HomeViewModel(
         observeSettings()
     }
 
+
     private fun observeSettings() {
         viewModelScope.launch {
             combine(

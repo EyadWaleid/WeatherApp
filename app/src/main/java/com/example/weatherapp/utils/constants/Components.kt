@@ -86,3 +86,18 @@ fun Error(){
     )
 
 }
+@Composable
+fun SplashLogo(){
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.weather)
+    )
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier.size(400.dp)
+    )
+}

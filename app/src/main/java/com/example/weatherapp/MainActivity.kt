@@ -37,12 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.weatherapp.data.datasource.local.datasource.fav.FavLocalDataSource
-import com.example.weatherapp.data.datasource.local.datasource.usersettings.UserPreferences
-import com.example.weatherapp.data.datasource.local.datasource.weather.WeatherLocalDatasource
-import com.example.weatherapp.data.datasource.remote.WeatherDataSource
-import com.example.weatherapp.data.repo.homeRepo.WeatherHomeRepo
-import com.example.weatherapp.data.repo.settings.SettingsRepo
+
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModel
 import com.example.weatherapp.screens.alert.viewmodel.AlertViewModelFactory
 import com.example.weatherapp.screens.discover.viewmodel.DiscoverFactoryModel
@@ -55,10 +50,8 @@ import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.utils.constants.Constants
 import com.example.weatherapp.utils.routes.Route
 import com.example.weatherapp.utils.connectivity.NetworkMonitor
-import com.example.weatherapp.utils.geoCoder.GeocoderHelper
 import com.example.weatherapp.utils.localization.AppLocalization
 import com.example.weatherapp.utils.localization.IAppLocalization
-import com.example.weatherapp.utils.location.LocationHelper
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -138,7 +131,7 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         if (currentDestination?.contains("FullUi") == false && currentDestination?.contains(
                                 "DetailScreen"
-                            ) == false
+                            ) == false && currentDestination?.contains("SplashScreen")==false && currentDestination?.contains("OnBoardScreen")==false
                         ) {
                             BottomNavigationBar(navController = navController)
 

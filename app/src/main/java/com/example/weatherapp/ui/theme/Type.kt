@@ -42,6 +42,11 @@ val Typography = Typography(
         fontWeight = FontWeight.Light,
         fontSize = 96.sp,
     ),
+    displayMedium = TextStyle(
+        fontFamily = spaceGrotesk,
+        fontWeight = FontWeight.Bold,
+        fontSize = 36.sp,
+    ),
 
     titleLarge = TextStyle(
         fontFamily = spaceGrotesk,
