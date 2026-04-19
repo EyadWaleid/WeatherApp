@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
 import com.example.weatherapp.data.model.entity.HourlyWeather
 import com.example.weatherapp.utils.constants.WeatherIcon
+import com.example.weatherapp.utils.constants.WeatherIconLarge
 
 @Composable
 fun HourlyWeather(modifier: Modifier= Modifier,hourlyWeather: List<HourlyWeather> ,tempUnits: String){
@@ -57,7 +58,7 @@ fun HourlyWeatherItem(modifier: Modifier= Modifier, icon: String, hour: String=s
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(hour, style = MaterialTheme.typography.labelMedium, color = textColor, modifier = modifier.weight(1f))
-            WeatherIcon(icon = icon, width = 30.dp,height=30.dp)
+            WeatherIconLarge(icon = icon, width = 30.dp,height=30.dp)
             Spacer(modifier = modifier.height(8.dp))
             Text(weatherValue, style = MaterialTheme.typography.titleMedium, color = colorResource(R.color.white),modifier = modifier.weight(1f))
         }

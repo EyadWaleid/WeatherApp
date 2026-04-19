@@ -185,7 +185,6 @@ class HomeViewModel(
             })
         }
     }
-
     sealed class WeatherState {
         object IsLoading : WeatherState()
         object PermissionDisabled : WeatherState()
@@ -202,10 +201,7 @@ class HomeViewModel(
             val windUnit: String
         ) : WeatherState()
     }
-
-
 }
-
 @Suppress("UNCHECKED_CAST")
 class WeatherFactory(
     private val repo: IWeatherHomeRepo,

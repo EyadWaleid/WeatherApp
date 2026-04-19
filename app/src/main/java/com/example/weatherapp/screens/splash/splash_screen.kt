@@ -2,6 +2,7 @@ package com.example.weatherapp.screens.splash
 
 import android.content.Context
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.weatherapp.R
@@ -88,7 +90,6 @@ fun SplashScreen(modifier: Modifier = Modifier,navController: NavHostController)
         ) {
             Spacer(modifier = Modifier.weight(1f))
             SplashLogo()
-
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 "Weather app",
